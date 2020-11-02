@@ -3,11 +3,13 @@
 
 #include "Arduino.h"
 #include "mcp_can.h"
+#include <SPI.h>
 
 class ArdLeaf
 {
   public:
-    ArdLeaf(int pinCS, int pinINT);
+    ArdLeaf(int pin_cs, int pin_int);
+    
     void connect();
     void update();
 
@@ -18,6 +20,7 @@ class ArdLeaf
     long unsigned int msgId; // CAN message ID
     unsigned char msgBuf[8]; // CAN 8 byte buffer
     unsigned char msgLen = 0;  // CAN data length
+    
     MCP_CAN* canEV;
 
     byte getValue(byte b, int pStart, int pEnd);

@@ -3,10 +3,9 @@
 #include "mcp_can.h"
 #include <SPI.h>
 
-ArdLeaf::ArdLeaf(int pin_cs, int pin_int)
-{
+ArdLeaf::ArdLeaf(int pin_cs, int pin_int) {
+  canEV = new MCP_CAN(pin_cs);
   pinMode(pin_int, INPUT);
-  MCP_CAN canEV(pin_cs);
 
   pinCS = pin_cs;
   pinINT = pin_int;
@@ -21,13 +20,14 @@ void ArdLeaf::connect() {
   } else {
     Serial.println("Error!");
   }
+
+  canEV->setMode(MCP_NORMAL);
   
 }
 
 void ArdLeaf::update() {
   if( !digitalRead(pinINT) ) { // Check if data is available
     canEV->readMsgBuf(&msgId, &msgLen, msgBuf);
-
     if (msgId == 0x54b) {
       ac_fan_speed = getValue(msgBuf[4], 0, 7) / 8;
     }
