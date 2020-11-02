@@ -5,4 +5,5 @@ Still in early development, currently prints information about the car into the 
 
 > ArdLeaf uses files from the MCP_CAN library by coryjfowler https://github.com/coryjfowler/MCP_CAN_lib
 
+Image of serial monitor information:
 ![Information in serial monitor](images/serial.jpg)
