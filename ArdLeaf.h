@@ -15,11 +15,20 @@ class ArdLeaf
     void connect();
     void update();
 
-    int ac_fan_speed;
+    int speed;
+    int status;
+    int eco_selected;
+    int gear_position;
     int soc_gids;
-    int eco_mode;
     float soc_percent;
     float soc_displayed;
+    int soh;
+    float battery_volts;
+    int battery_current;
+    float battery_kw;
+    float battery_temperature;
+    float ambient_temperature;
+    int ac_fan_speed;
   private:
     int pinCS;
     int pinINT;
@@ -30,6 +39,7 @@ class ArdLeaf
     MCP_CAN* canEV;
 
     byte getValue(byte b, int pStart, int pEnd);
+    void printBinary(byte inByte);
 };
 
 #endif
