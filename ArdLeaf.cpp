@@ -22,16 +22,25 @@ void ArdLeaf::connect() {
   }
 
   canEV->setMode(MCP_NORMAL);
-  
 }
 
 void ArdLeaf::update() {
   if( !digitalRead(pinINT) ) { // Check if data is available
-    canEV->readMsgBuf(&msgId, &msgLen, msgBuf);
-    if (msgId == 0x54b) {
-      ac_fan_speed = getValue(msgBuf[4], 0, 7) / 8;
-    }
+    canEV->readMsgBuf(&msgId, &msgLen, msg);
+    if (msgId == 0x5bc) { // SOC (With degradation)
+      soc_gids = (msg[0] << 2) | (msg[1] >> 6);
+      soc_percent = (soc_gids / MAX_GIDS) * 100.0F;
 
+    } else if (msgId == 0x55b) { // SOC (Without degradation)
+      soc_displayed = ( (msg[0] << 2) | (msg[1] >> 6) ) / 10.0F;
+
+    } else if (msgId == 0x54b) { // A/C
+      ac_fan_speed = (msg[4] / 8);
+
+    } else if (msgId == 0x11a) { // Shift controller (Eco, Position, On/Off)
+      eco_mode = getValue(msg[1], 4, 4);
+
+    }
   }
 }
 
