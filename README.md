@@ -1,4 +1,4 @@
 # ArdLeaf
 An arduino library for reading information from a Nissan Leaf canbus.
 
-Still a work in progress.
+NOT WORKING, STILL IN DEVELOPMENT.
