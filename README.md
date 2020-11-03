@@ -1,5 +1,5 @@
 # ArdLeaf
-An arduino library for reading information from a Nissan Leaf canbus.
+An arduino library for reading information from a Nissan Leaf ev-canbus, supports MCP2515 controllers.
 Includes an application that displays information like speed, power consumption and current gear.
 
 This is a personal project, so there isn't much documentation.
