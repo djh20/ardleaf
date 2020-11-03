@@ -10,6 +10,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "pack": "electron-builder --dir",
+    "dist": "electron-builder",
     "lint": "echo \"No linting configured\""
   },
   "keywords": [],
