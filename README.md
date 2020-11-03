@@ -19,4 +19,4 @@ The application is located at ArdLeaf_Application\out\ardleaf-win32-x64\ardleaf.
 When started, it will search through COM ports for an arduino (Make sure any other arduinos are disconnected).
 
 Image of application:
-![Image of application](Images/app.jpg)
+![Image of application](Images/application.jpg)
