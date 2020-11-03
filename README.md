@@ -10,12 +10,12 @@ ArdLeaf uses files from the MCP_CAN library by coryjfowler https://github.com/co
 This README will be updated with more information when I have time.
 
 ## Library
-1. Download the "ardleaf-library" zip file from https://github.com/danmrdj/ardleaf/releases/latest/
+1. Download the "ardleaf-library.zip" file from https://github.com/danmrdj/ardleaf/releases/latest/
 2. Open Arduino, do Sketch > Include Library > Add .ZIP Library and select the zip file.
 3. Upload the "ArdLeaf_Read" example from File > Examples > ArdLeaf
 
 ## Application
-1. Download the "ardleaf-application" zip file from https://github.com/danmrdj/ardleaf/releases/latest/
+1. Download the "ardleaf-application.zip" file from https://github.com/danmrdj/ardleaf/releases/latest/
 2. Extract the zip file.
 3. Open the "ardleaf.exe" file.
 
