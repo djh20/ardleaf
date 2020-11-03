@@ -43,8 +43,14 @@ void ArdLeaf::update() {
       battery_current = -(battery_current / (2.0F));
       battery_kw = (battery_current * battery_volts)/1000.0F;
 
+      sprintf(out, "kw %f", battery_kw);
+      Serial.println(out);
+
     } else if (msgId == 0x284) { // Speed sensors
       speed = ( (msg[4] << 8) | msg[5] ) / 92;
+
+      sprintf(out, "spd %u", speed);
+      Serial.println(out);
 
     } else if (msgId == 0x54b) { // A/C
       ac_fan_speed = (msg[4] / 8);
@@ -53,6 +59,12 @@ void ArdLeaf::update() {
       eco_selected = getValue(msg[1], 4, 4);
       status = getValue(msg[1], 6, 6);
       gear_position = getValue(msg[0], 4, 7);
+
+      sprintf(out, "eco %u", eco_selected);
+      Serial.println(out);
+
+      sprintf(out, "gear %u", gear_position);
+      Serial.println(out);
 
     } else if (msgId == 0x5c0) { // Battery temperature
       if ( (msg[0]>>6) == 1 ) { // Checks that a value has been calculated, I think

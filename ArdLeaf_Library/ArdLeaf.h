@@ -35,6 +35,7 @@ class ArdLeaf
     long unsigned int msgId; // CAN message ID
     unsigned char msg[8]; // CAN 8 byte buffer
     unsigned char msgLen = 0;  // CAN data length
+    char out[128]; // Serial out
     
     MCP_CAN* canEV;
 

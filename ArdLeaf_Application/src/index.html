@@ -10,16 +10,27 @@
   <body>
 
     <div id="main">
-      <div id="dash">
-        <div id="gear-container">
-          <p id="gear-p">P</p>
-          <p id="gear-r">R</p>
-          <p id="gear-n">N</p>
-          <p id="gear-d">D</p>
-        </div>
-        <div id="speed-container">
-          <p id="speed">30</p>
+      <div id="screen-1">
+        <p>Searching for device... Make sure it's connected!</p>
+      </div>
+      <div id="screen-2">
+        <div id="dash">
+          <p class="faded-1" id="gear-label">Park</p>
+          <div id="eco-indicator">
+            <p>ECO</p>
+          </div>
+          <p id="speed-label">10</p>
           <p id="speed-unit">KM/H</p>
+          
+          <div id="power-bar">
+            <div class="negative">
+              <div id="power-bar-negative"></div>
+            </div>
+            <div class="positive">
+              <div id="power-bar-positive"></div>
+            </div>
+          </div>
+          <p id="power-label">2.5kW</p>
         </div>
       </div>
     </div>
