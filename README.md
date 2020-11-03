@@ -3,7 +3,8 @@ An arduino library for reading information from a Nissan Leaf canbus.
 
 Currently prints information about the car into the serial monitor (I'm working on an application to show this in a better form).
 
-ArdLeaf uses files from the MCP_CAN library by coryjfowler https://github.com/coryjfowler/MCP_CAN_lib
+ArdLeaf uses files from the MCP_CAN library by coryjfowler https://github.com/coryjfowler/MCP_CAN_lib 
+(These files come with the library, you don't need to download anything else).
 
 ## Installation
 1. Download the ZIP from https://github.com/danmanmrdj/ardleaf/archive/master.zip
