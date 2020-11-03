@@ -13,4 +13,4 @@ ArdLeaf uses files from the MCP_CAN library by coryjfowler https://github.com/co
 This README will be updated with more information when I have time.
 
 Image of serial monitor information:
-![Information in serial monitor](images/serial.jpg)
+![Information in serial monitor](Images/serial.jpg)
