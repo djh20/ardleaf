@@ -13,7 +13,8 @@ This README will be updated with more information when I have time.
 1. Download the ZIP from https://github.com/danmrdj/ardleaf/releases/latest/
 2. Extract the ZIP file
 3. Copy the "ArdLeaf_Library" folder to your arduino libraries folder
-4. The application .exe file can be found in the "ArdLeaf_Application-win32-x64" folder.
+4. Upload the "ArdLeaf_Read" example from File > Examples > ArdLeaf_Library
+5. The application .exe file can be found in the "ArdLeaf_Application-win32-x64" folder.
 
 ## Application
 When starting the application, it will search through all com ports until it finds an arduino.
