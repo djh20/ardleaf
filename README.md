@@ -18,4 +18,5 @@ This README will be updated with more information when I have time.
 ## Application
 When starting the application, it will search through all com ports until it finds an arduino.
 
+![Wiring](Images/wiring.jpg)
 ![Image of application](Images/application.jpg)
