@@ -9,7 +9,7 @@ ArdLeaf uses files from the MCP_CAN library by coryjfowler https://github.com/co
 ## Installation
 1. Download the ZIP from https://github.com/danmrdj/ardleaf/archive/master.zip
 2. Extract the ZIP file
-3. Copy the "ArdLeaf" folder from inside the "Library" folder to your arudino libraries folder
+3. Copy the "ArdLeaf_Library" to your arudino libraries folder
 
 This README will be updated with more information when I have time.
 
