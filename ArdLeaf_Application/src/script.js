@@ -72,7 +72,7 @@ function connect(path) {
     });
     connectedPort = port;
     SCREEN_1.style.display = "none";
-    SCREEN_2.style.display = "block";
+    SCREEN_2.style.display = "flex";
     
     port.on('data', function(buffer) {
       let data = buffer.toString();
