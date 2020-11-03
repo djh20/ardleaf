@@ -43,7 +43,6 @@ void ArdLeaf::update() {
       battery_current = -(battery_current / (2.0F));
       battery_kw = (battery_current * battery_volts)/1000.0F;
 
-      //sprintf(out, "kw %f", battery_kw);
       Serial.print("kw "); Serial.println(battery_kw);
 
     } else if (msgId == 0x284) { // Speed sensors
@@ -64,6 +63,9 @@ void ArdLeaf::update() {
       Serial.println(out);
 
       sprintf(out, "gear %u", gear_position);
+      Serial.println(out);
+
+      sprintf(out, "on %u", status);
       Serial.println(out);
 
     } else if (msgId == 0x5c0) { // Battery temperature

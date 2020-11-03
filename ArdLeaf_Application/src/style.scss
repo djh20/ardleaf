@@ -58,14 +58,14 @@ body.dark-mode {
 #gear-label {
   text-align: center;
   font-size: 20pt;
-  margin: 0 0 15px 0;
+  margin: 5px 0 10px 0;
 }
 #power-bar {
   display: flex;
   background: #d3d3d3;
   height: 9px;
   width: 360px;
-  margin: 20px 0 15px 0;
+  margin: 0px 0 15px 0;
   .negative {
     display: flex;
     justify-content: flex-end;
@@ -99,7 +99,22 @@ body.dark-mode {
     color: #ffffff;
   }
 }
-
 #power-bar.dark-mode {
   background: #111111;
+}
+
+#info {
+  margin-left: 100px;
+  width: 300px;
+  height: 330px;
+  .info-title {
+    font-size: 12pt;
+    margin: 0;
+    opacity: 0.7;
+  }
+  .info-value {
+    margin: 0;
+    font-size: 27pt;
+    margin-bottom: 13px;
+  }
 }

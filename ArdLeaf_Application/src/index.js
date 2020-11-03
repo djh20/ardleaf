@@ -11,7 +11,7 @@ app.allowRendererProcessReuse = false; // makes the serialport module work on th
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
+    width: 900,
     height: 600,
     webPreferences: {
       nodeIntegration: true,

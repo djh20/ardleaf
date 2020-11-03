@@ -11,6 +11,9 @@ const POWER_LABEL = document.getElementById("power-label");
 const POWER_BAR_POSITIVE = document.getElementById("power-bar-positive");
 const POWER_BAR_NEGATIVE = document.getElementById("power-bar-negative");
 const ECO_INDICATOR = document.getElementById("eco-indicator");
+const CAR_STATUS_LABEL = document.getElementById("car-status");
+
+ECO_INDICATOR.style.display = "none";
 
 function update(type, value) {
   if (type == "spd") {
@@ -27,7 +30,7 @@ function update(type, value) {
 
   } else if (type == "kw") {
     value = parseFloat(value);
-    var positiveValue = (value/80)*100;
+    var positiveValue = (value/90)*100;
     if (positiveValue < 0) positiveValue = 0;
 
     var negativeValue = (-value/20)*100;
@@ -44,6 +47,15 @@ function update(type, value) {
       ECO_INDICATOR.style.display = "";
     } else {
       ECO_INDICATOR.style.display = "none";
+    }
+
+  } else if (type == "on") {
+    value = (value == 1 ? true : false);
+
+    if (value) {
+      CAR_STATUS_LABEL.innerText = "ON";
+    } else {
+      CAR_STATUS_LABEL.innerText = "OFF";
     }
   }
 
