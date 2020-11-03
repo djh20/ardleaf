@@ -19,5 +19,6 @@ This README will be updated with more information when I have time.
 ## Application
 When starting the application, it will search through all com ports until it finds an arduino.
 
+This is being developed on a 2011 Nissan Leaf ZE0, using the diagram below.
 ![Wiring](Images/wiring.jpg)
 ![Image of application](Images/application.jpg)
