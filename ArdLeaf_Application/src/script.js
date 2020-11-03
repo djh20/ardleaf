@@ -18,7 +18,8 @@ function update(type, value) {
     SPEED_LABEL.innerText = value;
 
   } else if (type == "gear") {
-    if (value == 1) value = "Park";
+    if (value == 0) value = "Park";
+    else if (value == 1) value = "Park";
     else if (value == 2) value = "Reverse";
     else if (value == 3) value = "Neutral";
     else if (value == 4) value = "Drive";
