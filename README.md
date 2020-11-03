@@ -14,9 +14,3 @@ This README will be updated with more information when I have time.
 2. Extract the ZIP file
 3. Copy the "ArdLeaf_Library" to your arudino libraries folder
 
-## Application
-The application is located at ArdLeaf_Application\out\ardleaf-win32-x64\ardleaf.exe (64-bit, Windows)
-When started, it will search through COM ports for an arduino (Make sure any other arduinos are disconnected).
-
-Image of application:
-![Image of application](Images/application.jpg)
