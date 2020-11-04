@@ -18,17 +18,26 @@ const AC_SPEED_LABEL = document.getElementById("ac-speed");
 
 ECO_INDICATOR.style.display = "none";
 
+function setScreen(screen) {
+  if (screen == 1) {
+    SCREEN_1.style.display = "block";
+    SCREEN_2.style.display = "none";
+  } else {
+    SCREEN_1.style.display = "none";
+    SCREEN_2.style.display = "flex";
+  }
+}
 function update(type, value) {
   if (type == "spd") {
     value = parseInt(value);
     SPEED_LABEL.innerText = value;
 
   } else if (type == "gear") {
-    if (value == 0) value = "Park";
-    else if (value == 1) value = "Park";
-    else if (value == 2) value = "Reverse";
-    else if (value == 3) value = "Neutral";
-    else if (value == 4) value = "Drive";
+    if (value == 0) value = "P";
+    else if (value == 1) value = "P";
+    else if (value == 2) value = "R";
+    else if (value == 3) value = "N";
+    else if (value == 4) value = "D";
     GEAR_LABEL.innerText = value;
 
   } else if (type == "tmp_a") { // Ambient temperature
@@ -75,7 +84,6 @@ function update(type, value) {
 
   info[type] = value;
 }
-
 function connect(path) {
   return new Promise((resolve, reject) => {
     let port = new SerialPort(path, {baudRate: 115200}, function (err) {
@@ -85,9 +93,13 @@ function connect(path) {
       }
     });
     connectedPort = port;
-    SCREEN_1.style.display = "none";
-    SCREEN_2.style.display = "flex";
+    setScreen(2);
     
+    port.on('close', function() {
+      setScreen(1);
+      connectedPort = false;
+    });
+
     port.on('data', function(buffer) {
       let data = buffer.toString();
       let dataArray = data.split("\n");
@@ -110,6 +122,7 @@ async function getPorts() {
   const ports = await SerialPort.list();
   for (i in ports) {
     let port = ports[i];
+    console.log(port);
     if (port.manufacturer == "Arduino LLC (www.arduino.cc)" || port.manufacturer == "wch.cn") {
       let result = await connect(port.path);
       console.log(result);
