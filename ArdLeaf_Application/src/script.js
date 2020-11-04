@@ -12,6 +12,9 @@ const POWER_BAR_POSITIVE = document.getElementById("power-bar-positive");
 const POWER_BAR_NEGATIVE = document.getElementById("power-bar-negative");
 const ECO_INDICATOR = document.getElementById("eco-indicator");
 const CAR_STATUS_LABEL = document.getElementById("car-status");
+const AMBIENT_TEMP_LABEL = document.getElementById("ambient-temp");
+const BATTERY_TEMP_LABEL = document.getElementById("battery-temp");
+const AC_SPEED_LABEL = document.getElementById("ac-speed");
 
 ECO_INDICATOR.style.display = "none";
 
@@ -27,6 +30,17 @@ function update(type, value) {
     else if (value == 3) value = "Neutral";
     else if (value == 4) value = "Drive";
     GEAR_LABEL.innerText = value;
+
+  } else if (type == "tmp_a") { // Ambient temperature
+    value = parseFloat(value);
+    AMBIENT_TEMP_LABEL.innerText = `${value}°C`;
+
+  } else if (type == "tmp_b") { // Ambient temperature
+    value = parseFloat(value);
+    BATTERY_TEMP_LABEL.innerText = `${value}°C`;
+
+  } else if (type == "ac") { // A/C speed
+    AC_SPEED_LABEL.innerText = value;
 
   } else if (type == "kw") {
     value = parseFloat(value);

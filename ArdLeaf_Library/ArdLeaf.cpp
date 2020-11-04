@@ -54,6 +54,9 @@ void ArdLeaf::update() {
     } else if (msgId == 0x54b) { // A/C
       ac_fan_speed = (msg[4] / 8);
 
+      sprintf(out, "ac %u", ac_fan_speed);
+      Serial.println(out);
+
     } else if (msgId == 0x11a) { // Shift controller (Eco, Position, On/Off)
       eco_selected = getValue(msg[1], 4, 4);
       status = getValue(msg[1], 6, 6);
@@ -71,11 +74,15 @@ void ArdLeaf::update() {
     } else if (msgId == 0x5c0) { // Battery temperature
       if ( (msg[0]>>6) == 1 ) { // Checks that a value has been calculated, I think
         battery_temperature = msg[2] / 2 - 40;
+
+        Serial.print("tmp_b "); Serial.println(battery_temperature);
       }
     
     } else if (msgId == 0x54c) { // Ambient temperature
       if (msg[6] != 0xff) { // Make sure it equals something
         ambient_temperature = msg[6] / 2.0 - 40;
+
+        Serial.print("tmp_a "); Serial.println(ambient_temperature);
       }
 
     }
