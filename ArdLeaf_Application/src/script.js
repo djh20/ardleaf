@@ -1,4 +1,5 @@
 const SerialPort = require('serialport');
+const Readline = require('@serialport/parser-readline')
 var info = {};
 var ports = [];
 var connectedPort;
@@ -100,19 +101,16 @@ function connect(path) {
       connectedPort = false;
     });
 
-    port.on('data', function(buffer) {
-      let data = buffer.toString();
-      let dataArray = data.split("\n");
-      dataArray.forEach((string) => {
-        if (string == "") return;
-        let split = string.split(" ");
-        let type = split[0];
-        let value = split[1];
+    const parser = port.pipe(new Readline({ delimiter: '\n' }))
+    parser.on('data', function(data) {
+      if (data == "") return;
+      let split = data.split(" ");
+      let type = split[0];
+      let value = split[1];
 
-        update(type, value);
-      });
+      update(type, value);
       console.log(info);
-    })
+    });
 
     resolve(`Connected to ${path}`);
   });

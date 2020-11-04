@@ -83,8 +83,8 @@ body.dark-mode {
 
 #gear-label {
   text-align: center;
-  font-size: 20pt;
-  margin: 5px 0 10px 0;
+  font-size: 16pt;
+  margin: 6px 0 16px 0;
 }
 
 #power-bar {
@@ -151,7 +151,6 @@ body.dark-mode {
 #info {
   margin-left: 70px;
   width: 300px;
-  height: 330px;
 }
 
 #info .info-title {
