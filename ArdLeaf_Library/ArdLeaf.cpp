@@ -37,13 +37,17 @@ void ArdLeaf::update() {
       Serial.print("soc "); Serial.println(soc);
 
     } else if (msgId == 0x1db) { // Voltage and current
-      battery_volts = ( (msg[2] << 2) | (msg[3] >> 6) ) / 2.0F;
+      battery_voltage = ( (msg[2] << 2) | (msg[3] >> 6) ) / 2.0F;
 
-      battery_current = ( (msg[0] << 3) | (msg[1] >> 5) );
+      // sent by the LBC, measured inside the battery box
+      // current is 11 bit twos complement big endian starting at bit 0
+      int16_t current = ((int16_t) msg[0] << 3) | (msg[1] & 0xe0) >> 5;
+      if (current & 0x0400) { // negative so extend the sign bit
+        current |= 0xf800;
+      }
+      battery_current = -current / 2.0f;
 
-      if(battery_current & 0x0400) battery_current |= 0xf800;
-      battery_current = -(battery_current / (2.0F));
-      battery_kw = (battery_current * battery_volts)/1000.0F;
+      battery_kw = (battery_current * battery_voltage)/1000.0F;
 
       Serial.print("kw "); Serial.println(battery_kw);
     } else if (msgId == 0x284) { // Speed sensors

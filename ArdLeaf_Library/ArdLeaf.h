@@ -23,8 +23,8 @@ class ArdLeaf
     float soc_percent;
     float soc;
     int soh;
-    float battery_volts;
-    int battery_current;
+    float battery_voltage;
+    float battery_current;
     float battery_kw;
     float battery_temperature;
     float ambient_temperature;
