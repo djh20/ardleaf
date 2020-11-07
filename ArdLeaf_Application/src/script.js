@@ -13,6 +13,7 @@ const POWER_BAR_POSITIVE = document.getElementById("power-bar-positive");
 const POWER_BAR_NEGATIVE = document.getElementById("power-bar-negative");
 const ECO_INDICATOR = document.getElementById("eco-indicator");
 const CAR_STATUS_LABEL = document.getElementById("car-status");
+const CHARGE_LABEL = document.getElementById("car-charge");
 const AMBIENT_TEMP_LABEL = document.getElementById("ambient-temp");
 const BATTERY_TEMP_LABEL = document.getElementById("battery-temp");
 const AC_SPEED_LABEL = document.getElementById("ac-speed");
@@ -52,6 +53,10 @@ function update(type, value) {
   } else if (type == "ac") { // A/C speed
     AC_SPEED_LABEL.innerText = value;
 
+  } else if (type == "soc") {
+    value = parseFloat(value);
+    CHARGE_LABEL.innerText = `${value}%`;
+    
   } else if (type == "kw") {
     value = parseFloat(value);
     var positiveValue = (value/90)*100;

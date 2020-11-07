@@ -21,7 +21,7 @@ class ArdLeaf
     int gear_position;
     int soc_gids;
     float soc_percent;
-    float soc_displayed;
+    float soc;
     int soh;
     float battery_volts;
     int battery_current;
@@ -40,7 +40,7 @@ class ArdLeaf
     MCP_CAN* canEV;
 
     byte getValue(byte b, int pStart, int pEnd);
-    void printBinary(byte inByte);
+    void printBinary(byte inByte, int len);
 };
 
 #endif

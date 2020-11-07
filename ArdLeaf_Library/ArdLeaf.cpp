@@ -33,17 +33,20 @@ void ArdLeaf::update() {
       soh = getValue(msg[4], 1, 7);
 
     } else if (msgId == 0x55b) { // SOC (Without degradation)
-      soc_displayed = ( (msg[0] << 2) | (msg[1] >> 6) ) / 10.0F;
+      soc = ( (msg[0] << 2) | (msg[1] >> 6) ) / 10.0F;
+      Serial.print("soc "); Serial.println(soc);
 
     } else if (msgId == 0x1db) { // Voltage and current
       battery_volts = ( (msg[2] << 2) | (msg[3] >> 6) ) / 2.0F;
 
-      battery_current = (msg[0] << 3) | (msg[1] >> 5);
+      battery_current = ( (msg[0] << 3) | (msg[1] >> 5) );
+      //printBinary(battery_current, 11);
+
       if(battery_current & 0x0400) battery_current |= 0xf800;
       battery_current = -(battery_current / (2.0F));
       battery_kw = (battery_current * battery_volts)/1000.0F;
-
-      Serial.print("kw "); Serial.println(battery_kw);
+      Serial.print("kw "); Serial.println(battery_current);
+      
 
     } else if (msgId == 0x284) { // Speed sensors
       speed = ( (msg[4] << 8) | msg[5] ) / 92;
@@ -110,9 +113,9 @@ byte ArdLeaf::getValue(byte b, int pStart, int pEnd) {
   return result;
 }
 
-void ArdLeaf::printBinary(byte inByte)
+void ArdLeaf::printBinary(byte inByte, int len)
 {
-  for (int b = 7; b >= 0; b--)
+  for (int b = len-1; b >= 0; b--)
   {
     //Serial.println(i);
     Serial.print(bitRead(inByte, b));
