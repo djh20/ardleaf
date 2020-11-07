@@ -1,8 +1,8 @@
 {
   "name": "ardleaf",
-  "productName": "ardleaf",
-  "version": "1.0.0",
-  "description": "My Electron application description",
+  "productName": "ArdLeaf",
+  "version": "1.0.2",
+  "description": "An application for displaying information from a Nissan Leaf canbus.",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -12,6 +12,12 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "lint": "echo \"No linting configured\""
+  },
+  "build": {
+    "appId": "com.danmrdj.ardleaf",
+    "win": {
+      "target": "zip"
+    }
   },
   "keywords": [],
   "author": {
