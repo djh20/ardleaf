@@ -12,8 +12,8 @@ ArdLeaf::ArdLeaf(int pin_cs, int pin_int) {
 }
 
 void ArdLeaf::connect() {
-  Serial.println("--- ArdLeaf ---");
-  Serial.print("Connecting to CAN...  ");
+  delay(3000);
+  Serial.print("Connecting...  ");
   
   if(canEV->begin(MCP_ANY, CAN_500KBPS, MCP_8MHZ) == CAN_OK) {
     Serial.println("Connected!");

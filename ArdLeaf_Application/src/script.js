@@ -110,11 +110,13 @@ function connect(path) {
     parser.on('data', function(data) {
       if (data == "") return;
       let split = data.split(" ");
-      let type = split[0];
-      let value = split[1];
+      if (split && split.length >= 2) {
+        let type = split[0];
+        let value = split[1];
 
-      update(type, value);
-      console.log(info);
+        update(type, value);
+        console.log(info);
+      }
     });
 
     resolve(`Connected to ${path}`);
