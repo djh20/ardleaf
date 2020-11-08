@@ -12,8 +12,8 @@ ArdLeaf::ArdLeaf(int pin_cs, int pin_int) {
 }
 
 void ArdLeaf::connect() {
-  delay(3000);
-  Serial.print("Connecting...  ");
+  delay(1000);
+  Serial.print("Connecting to CAN...  ");
   
   if(canEV->begin(MCP_ANY, CAN_500KBPS, MCP_8MHZ) == CAN_OK) {
     Serial.println("Connected!");
@@ -22,6 +22,8 @@ void ArdLeaf::connect() {
   }
 
   canEV->setMode(MCP_NORMAL);
+
+  delay(3000);
 }
 
 void ArdLeaf::update() {
@@ -34,7 +36,6 @@ void ArdLeaf::update() {
 
     } else if (msgId == 0x55b) { // SOC (Without degradation)
       soc = ( (msg[0] << 2) | (msg[1] >> 6) ) / 10.0F;
-      Serial.print("soc "); Serial.println(soc);
 
     } else if (msgId == 0x1db) { // Voltage and current
       battery_voltage = ( (msg[2] << 2) | (msg[3] >> 6) ) / 2.0F;
@@ -48,53 +49,52 @@ void ArdLeaf::update() {
       battery_current = -current / 2.0f;
 
       battery_kw = (battery_current * battery_voltage)/1000.0F;
-
-      Serial.print("kw "); Serial.println(battery_kw);
+      
     } else if (msgId == 0x284) { // Speed sensors
       speed = ( (msg[4] << 8) | msg[5] ) / 92;
 
-      sprintf(out, "spd %u", speed);
-      Serial.println(out);
-
     } else if (msgId == 0x54b) { // A/C
       ac_fan_speed = (msg[4] / 8);
-
-      sprintf(out, "ac %u", ac_fan_speed);
-      Serial.println(out);
 
     } else if (msgId == 0x11a) { // Shift controller (Eco, Position, On/Off)
       eco_selected = getValue(msg[1], 4, 4);
       status = getValue(msg[1], 6, 6);
       gear_position = getValue(msg[0], 4, 7);
 
-      sprintf(out, "eco %u", eco_selected);
-      Serial.println(out);
-
-      sprintf(out, "gear %u", gear_position);
-      Serial.println(out);
-
-      sprintf(out, "on %u", status);
-      Serial.println(out);
-
     } else if (msgId == 0x5c0) { // Battery temperature
       if ( (msg[0]>>6) == 1 ) { // Checks that a value has been calculated, I think
         battery_temperature = msg[2] / 2 - 40;
-
-        Serial.print("tmp_b "); Serial.println(battery_temperature);
       }
     
     } else if (msgId == 0x54c) { // Ambient temperature
       if (msg[6] != 0xff) { // Make sure it equals something
         ambient_temperature = msg[6] / 2.0 - 40;
-
-        Serial.print("tmp_a "); Serial.println(ambient_temperature);
       }
+    }
+  }
+  if (serialEnabled) {
+    unsigned long ms = millis();
+    if (status) { 
+      serialInterval = 50;
+    } else { 
+      serialInterval = 1000; // Lower the send rate if the car is off.
+    }
+    if (ms - serialLast > serialInterval) {
+      serialLast = ms;
+      Serial.print("on "); Serial.println(status);
+      Serial.print("spd "); Serial.println(speed);
+      Serial.print("kw "); Serial.println(battery_kw);
+      Serial.print("soc "); Serial.println(soc);
+      Serial.print("eco "); Serial.println(eco_selected);
+      Serial.print("ac "); Serial.println(ac_fan_speed);
+      Serial.print("gear "); Serial.println(gear_position);
+      Serial.print("tmp_b "); Serial.println(battery_temperature);
+      Serial.print("tmp_a "); Serial.println(ambient_temperature);
     }
   }
 }
 
 byte ArdLeaf::getValue(byte b, int pStart, int pEnd) {
-  
   byte mask = 0;
   int counter = 1;
   for (int i = 0; i <= 7; i++) {
@@ -108,18 +108,18 @@ byte ArdLeaf::getValue(byte b, int pStart, int pEnd) {
   if (pStart != 0) {
     result = result >> pStart;
   }
-  //printBinary(b);
-  //printBinary(mask);
-  //printBinary(result);
   return result;
 }
 
-void ArdLeaf::printBinary(byte inByte, int len)
-{
+void ArdLeaf::printBinary(byte inByte, int len){
   for (int b = len-1; b >= 0; b--)
   {
     //Serial.println(i);
     Serial.print(bitRead(inByte, b));
   }
   Serial.println();
+}
+
+void ArdLeaf::setSerial(bool state) {
+  serialEnabled = state;
 }

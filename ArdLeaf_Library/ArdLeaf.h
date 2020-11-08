@@ -14,6 +14,7 @@ class ArdLeaf
     
     void connect();
     void update();
+    void setSerial(bool state);
 
     int speed;
     int status;
@@ -30,6 +31,10 @@ class ArdLeaf
     float ambient_temperature;
     int ac_fan_speed;
   private:
+    bool serialEnabled = true; // Serial enabled
+    int serialInterval; // Interval of serial update
+    long serialLast; // Stores the time of the last update
+
     int pinCS;
     int pinINT;
     long unsigned int msgId; // CAN message ID
