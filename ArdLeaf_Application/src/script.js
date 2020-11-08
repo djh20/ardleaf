@@ -1,8 +1,5 @@
-const SerialPort = require('serialport');
-const Readline = require('@serialport/parser-readline')
 var info = {};
-var ports = [];
-var connectedPort;
+var ws;
 
 const SCREEN_1 = document.getElementById("screen-1");
 const SCREEN_2 = document.getElementById("screen-2");
@@ -90,53 +87,35 @@ function update(type, value) {
 
   info[type] = value;
 }
-function connect(path) {
-  return new Promise((resolve, reject) => {
-    let port = new SerialPort(path, {baudRate: 115200}, function (err) {
-      if (err) {
-        reject();
-        return console.log('Error: ', err.message);
-      }
-    });
-    connectedPort = port;
+function connect() {
+  if (ws) return;
+  console.log("Connecting...");
+  var socket = new WebSocket("ws://192.168.4.1");
+  socket.onopen = function() {
+    console.log("Connected!");
+    ws = socket;
     setScreen(2);
-    
-    port.on('close', function() {
-      setScreen(1);
-      connectedPort = false;
-    });
+  };
+  socket.onmessage = function(event) {
+    let data = event.data;
+    let split = data.split(" ");
+    if (split && split.length >= 2) {
+      let type = split[0];
+      let value = split[1];
 
-    const parser = port.pipe(new Readline({ delimiter: '\n' }))
-    parser.on('data', function(data) {
-      if (data == "") return;
-      let split = data.split(" ");
-      if (split && split.length >= 2) {
-        let type = split[0];
-        let value = split[1];
-
-        update(type, value);
-        console.log(info);
-      }
-    });
-
-    resolve(`Connected to ${path}`);
-  });
-}
-async function getPorts() {
-  if (connectedPort) return;
-  const ports = await SerialPort.list();
-  for (i in ports) {
-    let port = ports[i];
-    console.log(port);
-    if (port.manufacturer == "Arduino LLC (www.arduino.cc)" || port.manufacturer == "wch.cn") {
-      let result = await connect(port.path);
-      console.log(result);
+      update(type, value);
+      console.log(info);
     }
   }
+  socket.onclose = function() {
+    console.log("Lost connection");
+    ws = null;
+    setScreen(1);
+    connect();
+  };
 }
+connect();
 
-setInterval(getPorts, 2000);
-getPorts();
 
 /*
 function darkMode() {

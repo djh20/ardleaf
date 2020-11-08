@@ -6,7 +6,7 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
   app.quit();
 }
 
-app.allowRendererProcessReuse = false; // makes the serialport module work on the client
+//app.allowRendererProcessReuse = false; // makes the serialport module work on the client
 
 const createWindow = () => {
   // Create the browser window.
@@ -24,7 +24,7 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
