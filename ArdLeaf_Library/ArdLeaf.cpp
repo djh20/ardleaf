@@ -12,7 +12,6 @@ ArdLeaf::ArdLeaf(int pin_cs, int pin_int) {
 }
 
 void ArdLeaf::connect() {
-  delay(1000);
   Serial.print("Connecting to CAN...  ");
   
   if(canEV->begin(MCP_ANY, CAN_500KBPS, MCP_8MHZ) == CAN_OK) {
@@ -22,8 +21,6 @@ void ArdLeaf::connect() {
   }
 
   canEV->setMode(MCP_NORMAL);
-
-  delay(3000);
 }
 
 void ArdLeaf::update() {
@@ -70,6 +67,15 @@ void ArdLeaf::update() {
       if (msg[6] != 0xff) { // Make sure it equals something
         ambient_temperature = msg[6] / 2.0 - 40;
       }
+
+    } else if (msgId == 0x1d4) {
+      int chargeStatus = getValue(msg[6], 5, 7);
+      if (chargeStatus == 6 || chargeStatus == 7) {
+        charging = 1;
+      } else {
+        charging = 0;
+      }
+
     }
   }
   if (serialEnabled) {
@@ -90,6 +96,7 @@ void ArdLeaf::update() {
       Serial.print("gear "); Serial.println(gear_position);
       Serial.print("tmp_b "); Serial.println(battery_temperature);
       Serial.print("tmp_a "); Serial.println(ambient_temperature);
+      Serial.print("charging "); Serial.println(charging);
     }
   }
 }

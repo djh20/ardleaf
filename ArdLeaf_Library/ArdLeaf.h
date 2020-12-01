@@ -19,6 +19,7 @@ class ArdLeaf
     int speed;
     int status;
     int eco_selected;
+    int charging;
     int gear_position;
     int soc_gids;
     float soc_percent;
