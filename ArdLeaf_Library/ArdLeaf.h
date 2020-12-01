@@ -15,6 +15,7 @@ class ArdLeaf
     void connect();
     void update();
     void setSerial(bool state);
+    void setChanged(void (*callback)(String));
 
     int speed;
     int status;

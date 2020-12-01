@@ -130,3 +130,7 @@ void ArdLeaf::printBinary(byte inByte, int len){
 void ArdLeaf::setSerial(bool state) {
   serialEnabled = state;
 }
+
+void ArdLeaf::setChanged(void (*callback)(String)) {
+  callback("hello");
+}
