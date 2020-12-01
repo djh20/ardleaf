@@ -45,7 +45,7 @@ void ArdLeaf::update() {
       }
       battery_current = -current / 2.0f;
 
-      battery_kw = (battery_current * battery_voltage)/1000.0F;
+      battery_power = (battery_current * battery_voltage)/1000.0F;
       
     } else if (msgId == 0x284) { // Speed sensors
       speed = ( (msg[4] << 8) | msg[5] ) / 92;
@@ -89,7 +89,7 @@ void ArdLeaf::update() {
       serialLast = ms;
       Serial.print("on "); Serial.println(status);
       Serial.print("spd "); Serial.println(speed);
-      Serial.print("kw "); Serial.println(battery_kw);
+      Serial.print("kw "); Serial.println(battery_power);
       Serial.print("soc "); Serial.println(soc);
       Serial.print("eco "); Serial.println(eco_selected);
       Serial.print("ac "); Serial.println(ac_fan_speed);
@@ -129,8 +129,4 @@ void ArdLeaf::printBinary(byte inByte, int len){
 
 void ArdLeaf::setSerial(bool state) {
   serialEnabled = state;
-}
-
-void ArdLeaf::setChanged(void (*callback)(String)) {
-  callback("hello");
 }

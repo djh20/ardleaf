@@ -15,7 +15,6 @@ class ArdLeaf
     void connect();
     void update();
     void setSerial(bool state);
-    void setChanged(void (*callback)(String));
 
     int speed;
     int status;
@@ -28,7 +27,7 @@ class ArdLeaf
     int soh;
     float battery_voltage;
     float battery_current;
-    float battery_kw;
+    float battery_power;
     float battery_temperature;
     float ambient_temperature;
     int ac_fan_speed;
