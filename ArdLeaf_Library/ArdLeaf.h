@@ -17,6 +17,7 @@ class ArdLeaf
     void setSerial(bool state);
 
     int speed;
+	int rawSpeed;
     int status;
     int eco_selected;
     int charging;

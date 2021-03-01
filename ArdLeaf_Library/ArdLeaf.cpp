@@ -48,7 +48,8 @@ void ArdLeaf::update() {
       battery_power = (battery_current * battery_voltage)/1000.0F;
       
     } else if (msgId == 0x284) { // Speed sensors
-      speed = ( (msg[4] << 8) | msg[5] ) / 92;
+	  rawSpeed = ( (msg[4] << 8) | msg[5] );
+      speed = rawSpeed / 92;
 
     } else if (msgId == 0x54b) { // A/C
       ac_fan_speed = (msg[4] / 8);
@@ -81,7 +82,7 @@ void ArdLeaf::update() {
   if (serialEnabled) {
     unsigned long ms = millis();
     if (status) { 
-      serialInterval = 50;
+      serialInterval = 100;
     } else { 
       serialInterval = 1000; // Lower the send rate if the car is off.
     }
