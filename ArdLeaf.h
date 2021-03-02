@@ -17,24 +17,33 @@ class ArdLeaf
     void setSerial(bool state);
 
     int speed;
-	  int rawSpeed;
+	  int rearSpeed;
+    int leftSpeed;
+    int rightSpeed;
     int status;
     int eco_selected;
     int charging;
     int gear_position;
     int soc_gids;
+    int soh;
+    int rpm;
+
     float soc_percent;
     float soc;
-    int soh;
+    
     float battery_voltage;
     float battery_current;
     float battery_power;
+
     float battery_temperature;
     float ambient_temperature;
+    float motor_temperature;
+    float inverter_temperature;
+
     int ac_fan_speed;
   private:
     bool serialEnabled = true; // Serial enabled
-    int serialInterval = 2000; // Interval of serial update
+    int serialInterval = 5000; // Interval of serial update
     long serialLast; // Stores the time of the last update
 
     int pinCS;

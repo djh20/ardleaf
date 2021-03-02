@@ -22,7 +22,6 @@ void ArdLeaf::connect() {
   }
 
   canEV->setMode(MCP_NORMAL);
-  
 }
 
 void ArdLeaf::update() {
@@ -36,6 +35,17 @@ void ArdLeaf::update() {
     } else if (msgId == 0x55b) { // SOC (Without degradation)
       soc = ( (msg[0] << 2) | (msg[1] >> 6) ) / 10.0F;
 
+    } else if (msgId == 0x55a) { // Motor & inverter temperatures
+      //motor_temperature = msg[5] * 0.5;
+      //inverter_temperature = msg[1] * 0.5;
+
+      // Motor, charge and inverter temperature guesses in Fahrenheit?
+      motor_temperature = 5.0 / 9.0 * (msg[1] - 32);
+      inverter_temperature = 5.0 / 9.0 * (msg[2] - 32);
+
+    } else if (msgId == 0x1da) { // Motor RPM
+      rpm = ( msg[4] << 7 | getValue(msg[5], 1, 7) );
+      
     } else if (msgId == 0x1db) { // Voltage and current
       battery_voltage = ( (msg[2] << 2) | (msg[3] >> 6) ) / 2.0F;
 
@@ -46,12 +56,14 @@ void ArdLeaf::update() {
         current |= 0xf800;
       }
       battery_current = -current / 2.0f;
-
       battery_power = (battery_current * battery_voltage)/1000.0F;
       
     } else if (msgId == 0x284) { // Speed sensors
-	  rawSpeed = ( (msg[4] << 8) | msg[5] );
-      speed = rawSpeed / 92;
+      leftSpeed = (msg[0] << 8) | msg[1];
+      rightSpeed = (msg[2] << 8) | msg[3];
+      rearSpeed = (msg[4] << 8) | msg[5];
+
+      speed = rearSpeed / 100;
 
     } else if (msgId == 0x54b) { // A/C
       ac_fan_speed = (msg[4] / 8);
@@ -86,7 +98,19 @@ void ArdLeaf::update() {
     if (ms - serialLast > serialInterval) {
       serialLast = ms;
 
-      Serial.print(status); Serial.print(','); Serial.print(speed); Serial.print(','); Serial.println(ac_fan_speed);
+      //Serial.print(status); Serial.print(','); Serial.print(speed); Serial.print(','); Serial.println(ac_fan_speed);
+      Serial.print(speed); Serial.print(',');
+      Serial.print(rearSpeed); Serial.print(',');
+      Serial.print(leftSpeed); Serial.print(',');
+      Serial.print(rightSpeed); Serial.print(',');
+      Serial.print(soc); Serial.print(',');
+      Serial.print(soc_gids); Serial.print(',');
+      Serial.print(rpm); Serial.print(',');
+      Serial.print(battery_power); Serial.print(',');
+      Serial.print(battery_temperature); Serial.print(',');
+      Serial.print(motor_temperature); Serial.print(',');
+      Serial.println(inverter_temperature);
+      
       /*
       Serial.print("on "); Serial.println(status);
       Serial.print("spd "); Serial.println(speed);

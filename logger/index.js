@@ -6,8 +6,8 @@ var connected = false;
 var connectedPort;
 var id = 1;
 
-var fileName = 'test.csv';
-var initialContent = 'ID,STATE,SPEED,AC SPEED\n';
+var fileName = 'leaf_recording.csv';
+var initialContent = 'ID,Speed,RearSpeed,LeftSpeed,RightSpeed,Soc,SocGids,RPM,Power,BattTemp,MotorTemp,InverterTemp\n';
 
 fs.writeFile(fileName, initialContent, (err) => {
   if (err) throw err;
@@ -20,10 +20,8 @@ async function scan() {
   let ports = await SerialPort.list();
   ports.forEach(async (port) => {
     console.log(`found port (${port.path} ${port.manufacturer})`);
-    if (port.manufacturer == 'wch.cn') {
-      let result = await connect(port.path);
-      console.log(result);
-    }
+    let result = await connect(port.path);
+    console.log(result);
   });
 }
 
