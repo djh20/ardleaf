@@ -17,7 +17,7 @@ class ArdLeaf
     void setSerial(bool state);
 
     int speed;
-	int rawSpeed;
+	  int rawSpeed;
     int status;
     int eco_selected;
     int charging;
@@ -34,7 +34,7 @@ class ArdLeaf
     int ac_fan_speed;
   private:
     bool serialEnabled = true; // Serial enabled
-    int serialInterval; // Interval of serial update
+    int serialInterval = 2000; // Interval of serial update
     long serialLast; // Stores the time of the last update
 
     int pinCS;

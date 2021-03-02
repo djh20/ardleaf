@@ -11,6 +11,7 @@ ArdLeaf::ArdLeaf(int pin_cs, int pin_int) {
   pinINT = pin_int;
 }
 
+
 void ArdLeaf::connect() {
   Serial.print("Connecting to CAN...  ");
   
@@ -21,6 +22,7 @@ void ArdLeaf::connect() {
   }
 
   canEV->setMode(MCP_NORMAL);
+  
 }
 
 void ArdLeaf::update() {
@@ -81,13 +83,11 @@ void ArdLeaf::update() {
   }
   if (serialEnabled) {
     unsigned long ms = millis();
-    if (status) { 
-      serialInterval = 100;
-    } else { 
-      serialInterval = 1000; // Lower the send rate if the car is off.
-    }
     if (ms - serialLast > serialInterval) {
       serialLast = ms;
+
+      Serial.print(status); Serial.print(','); Serial.print(speed); Serial.print(','); Serial.println(ac_fan_speed);
+      /*
       Serial.print("on "); Serial.println(status);
       Serial.print("spd "); Serial.println(speed);
       Serial.print("kw "); Serial.println(battery_power);
@@ -98,6 +98,7 @@ void ArdLeaf::update() {
       Serial.print("tmp_b "); Serial.println(battery_temperature);
       Serial.print("tmp_a "); Serial.println(ambient_temperature);
       Serial.print("charging "); Serial.println(charging);
+      */
     }
   }
 }
