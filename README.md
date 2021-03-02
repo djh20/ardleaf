@@ -3,8 +3,7 @@ An arduino library for reading information from a Nissan Leaf ev-canbus, support
 
 This is a personal project, so there isn't much documentation.
 
-ArdLeaf uses files from the MCP_CAN library by coryjfowler https://github.com/coryjfowler/MCP_CAN_lib 
-(These files come with this library).
+This repository contains files from the MCP_CAN library by coryjfowler https://github.com/coryjfowler/MCP_CAN_lib
 
 ## Library
 1. Download this repository.
