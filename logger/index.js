@@ -6,7 +6,7 @@ var connected = false;
 var connectedPort;
 var id = 1;
 
-var fileName = 'leaf_recording.csv';
+var fileName = 'leaf_recording4.csv';
 var initialContent = 'ID,Speed,RearSpeed,LeftSpeed,RightSpeed,Soc,SocGids,RPM,Power,BattTemp,MotorTemp,InverterTemp\n';
 
 fs.writeFile(fileName, initialContent, (err) => {

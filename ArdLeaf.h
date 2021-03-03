@@ -43,7 +43,7 @@ class ArdLeaf
     int ac_fan_speed;
   private:
     bool serialEnabled = true; // Serial enabled
-    int serialInterval = 5000; // Interval of serial update
+    int serialInterval = 500; // Interval of serial update
     long serialLast; // Stores the time of the last update
 
     int pinCS;
