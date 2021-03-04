@@ -29,7 +29,7 @@ void ArdLeaf::update() {
     canEV->readMsgBuf(&msgId, &msgLen, msg);
     if (msgId == 0x5bc) { // SOC (With degradation)
       soc_gids = (msg[0] << 2) | (msg[1] >> 6);
-      soc_percent = (soc_gids / MAX_GIDS) * 100.0F;
+      soc_gids_percent = (soc_gids / MAX_GIDS) * 100.0F;
       soh = readByte(msg[4], 1, 7);
 
     } else if (msgId == 0x55b) { // SOC (Without degradation)
@@ -90,41 +90,33 @@ void ArdLeaf::update() {
       } else {
         charging = 0;
       }
-
     }
   }
-  if (serialEnabled) {
-    unsigned long ms = millis();
-    if (ms - serialLast > serialInterval) {
-      serialLast = ms;
+  /*
+  if (bluetoothEnabled) {
+    ms = millis();
 
-      //Serial.print(status); Serial.print(','); Serial.print(speed); Serial.print(','); Serial.println(ac_fan_speed);
-      Serial.print(speed); Serial.print(',');
-      Serial.print(rearSpeed); Serial.print(',');
-      Serial.print(leftSpeed); Serial.print(',');
-      Serial.print(rightSpeed); Serial.print(',');
-      Serial.print(soc); Serial.print(',');
-      Serial.print(soc_gids); Serial.print(',');
-      Serial.print(rpm); Serial.print(',');
-      Serial.print(battery_power); Serial.print(',');
-      Serial.print(battery_temperature); Serial.print(',');
-      Serial.print(motor_temperature); Serial.print(',');
-      Serial.println(inverter_temperature);
+    if (ms-lastms > 100) {
+      lastms = ms;
+      sendCounter++;
+
+      bt.print(speed); bt.print(',');
+      bt.print(battery_power);
       
-      /*
-      Serial.print("on "); Serial.println(status);
-      Serial.print("spd "); Serial.println(speed);
-      Serial.print("kw "); Serial.println(battery_power);
-      Serial.print("soc "); Serial.println(soc);
-      Serial.print("eco "); Serial.println(eco_selected);
-      Serial.print("ac "); Serial.println(ac_fan_speed);
-      Serial.print("gear "); Serial.println(gear_position);
-      Serial.print("tmp_b "); Serial.println(battery_temperature);
-      Serial.print("tmp_a "); Serial.println(ambient_temperature);
-      Serial.print("charging "); Serial.println(charging);
-      */
+      if (sendCounter >= 10) {
+        sendCounter = 0;
+        bt.print(',');
+        bt.print(status); bt.print(',');
+        bt.print(gear_position); bt.print(',');
+        bt.print(soc);
+      } else {
+        bt.print(',');
+      }
+
+      bt.println();
     }
   }
+  */
 }
 
 byte ArdLeaf::readByte(byte b, int pStart, int pEnd) {
@@ -153,6 +145,13 @@ void ArdLeaf::printBinary(byte inByte, int len){
   Serial.println();
 }
 
-void ArdLeaf::setSerial(bool state) {
-  serialEnabled = state;
+void ArdLeaf::startSerial(long baud) {
+  Serial.begin(baud);
+  serialEnabled = true;
+}
+
+void ArdLeaf::startBluetooth(int tx, int rx) {
+  bt = new SoftwareSerial(tx, rx);
+  bt->begin(9600);
+  bluetoothEnabled = true;
 }
