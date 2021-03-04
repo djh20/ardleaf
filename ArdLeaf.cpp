@@ -2,6 +2,7 @@
 #include "ArdLeaf.h"
 #include "mcp_can.h"
 #include <SPI.h>
+#include <SoftwareSerial.h>
 
 ArdLeaf::ArdLeaf(int pin_cs, int pin_int) {
   canEV = new MCP_CAN(pin_cs);
@@ -10,7 +11,6 @@ ArdLeaf::ArdLeaf(int pin_cs, int pin_int) {
   pinCS = pin_cs;
   pinINT = pin_int;
 }
-
 
 void ArdLeaf::connect() {
   Serial.print("Connecting to CAN...  ");
@@ -30,7 +30,7 @@ void ArdLeaf::update() {
     if (msgId == 0x5bc) { // SOC (With degradation)
       soc_gids = (msg[0] << 2) | (msg[1] >> 6);
       soc_percent = (soc_gids / MAX_GIDS) * 100.0F;
-      soh = getValue(msg[4], 1, 7);
+      soh = readByte(msg[4], 1, 7);
 
     } else if (msgId == 0x55b) { // SOC (Without degradation)
       soc = ( (msg[0] << 2) | (msg[1] >> 6) ) / 10.0F;
@@ -44,7 +44,7 @@ void ArdLeaf::update() {
       inverter_temperature = 5.0 / 9.0 * (msg[2] - 32);
 
     } else if (msgId == 0x1da) { // Motor RPM
-      rpm = ( msg[4] << 7 | getValue(msg[5], 1, 7) );
+      rpm = ( msg[4] << 7 | readByte(msg[5], 1, 7) );
       
     } else if (msgId == 0x1db) { // Voltage and current
       battery_voltage = ( (msg[2] << 2) | (msg[3] >> 6) ) / 2.0F;
@@ -69,9 +69,9 @@ void ArdLeaf::update() {
       ac_fan_speed = (msg[4] / 8);
 
     } else if (msgId == 0x11a) { // Shift controller (Eco, Position, On/Off)
-      eco_selected = getValue(msg[1], 4, 4);
-      status = getValue(msg[1], 6, 6);
-      gear_position = getValue(msg[0], 4, 7);
+      eco_selected = readByte(msg[1], 4, 4);
+      status = readByte(msg[1], 6, 6);
+      gear_position = readByte(msg[0], 4, 7);
 
     } else if (msgId == 0x5c0) { // Battery temperature
       if ( (msg[0]>>6) == 1 ) { // Checks that a value has been calculated, I think
@@ -84,7 +84,7 @@ void ArdLeaf::update() {
       }
 
     } else if (msgId == 0x1d4) {
-      int chargeStatus = getValue(msg[6], 5, 7);
+      int chargeStatus = readByte(msg[6], 5, 7);
       if (chargeStatus == 6 || chargeStatus == 7) {
         charging = 1;
       } else {
@@ -127,7 +127,7 @@ void ArdLeaf::update() {
   }
 }
 
-byte ArdLeaf::getValue(byte b, int pStart, int pEnd) {
+byte ArdLeaf::readByte(byte b, int pStart, int pEnd) {
   byte mask = 0;
   int counter = 1;
   for (int i = 0; i <= 7; i++) {

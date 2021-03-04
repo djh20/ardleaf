@@ -28,6 +28,8 @@ class ArdLeaf
     int soh;
     int rpm;
 
+    int ac_fan_speed;
+
     float soc_percent;
     float soc;
     
@@ -40,7 +42,6 @@ class ArdLeaf
     float motor_temperature;
     float inverter_temperature;
 
-    int ac_fan_speed;
   private:
     bool serialEnabled = true; // Serial enabled
     int serialInterval = 500; // Interval of serial update
@@ -55,7 +56,7 @@ class ArdLeaf
     
     MCP_CAN* canEV;
 
-    byte getValue(byte b, int pStart, int pEnd);
+    byte readByte(byte b, int pStart, int pEnd);
     void printBinary(byte inByte, int len);
 };
 
