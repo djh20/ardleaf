@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 MCP_CAN	KEYWORD1
-ArdLeaf	KEYWORD1
+Leaf	KEYWORD1
 mcp_can_dfs	KEYWORD1
 mcp_can	KEYWORD1
 
