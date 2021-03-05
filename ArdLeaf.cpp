@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "ArdLeaf.h"
 #include "mcp_can.h"
+#include "metrics.h"
 #include <SPI.h>
 #include <SoftwareSerial.h>
 
@@ -10,6 +11,12 @@ ArdLeaf::ArdLeaf(int pin_cs, int pin_int) {
 
   pinCS = pin_cs;
   pinINT = pin_int;
+
+  //speed = new PropertyInt(1);
+  powered = new MetricBool(1);
+  speed = new MetricInt(2, 1);
+  gear = new MetricInt(3, 1);
+  soc = new MetricFloat(4);
 }
 
 void ArdLeaf::connect() {
@@ -25,71 +32,100 @@ void ArdLeaf::connect() {
 }
 
 void ArdLeaf::update() {
+  /*
+  if (Serial.available() > 0) {
+    int input = Serial.read();
+    //Serial.println(input, DEC);
+    //soc->setValue(soc->value+0.5f);
+    //soc->send(bt);
+  }
+  */
+  
   if( !digitalRead(pinINT) ) { // Check if data is available
     canEV->readMsgBuf(&msgId, &msgLen, msg);
     if (msgId == 0x5bc) { // SOC (With degradation)
-      soc_gids = (msg[0] << 2) | (msg[1] >> 6);
-      soc_gids_percent = (soc_gids / MAX_GIDS) * 100.0F;
-      soh = readByte(msg[4], 1, 7);
+      ///soc_gids = (msg[0] << 2) | (msg[1] >> 6);
+      ///soc_gids_percent = (soc_gids / MAX_GIDS) * 100.0F;
+      ///soh = readByte(msg[4], 1, 7);
 
     } else if (msgId == 0x55b) { // SOC (Without degradation)
-      soc = ( (msg[0] << 2) | (msg[1] >> 6) ) / 10.0F;
+      float soc_percent = ( (msg[0] << 2) | (msg[1] >> 6) ) / 10.0F;
+
+      soc->setValue(soc_percent);
+
+      if (bluetoothEnabled) {
+        soc->send(bt);
+      }
 
     } else if (msgId == 0x55a) { // Motor & inverter temperatures
-      //motor_temperature = msg[5] * 0.5;
-      //inverter_temperature = msg[1] * 0.5;
-
       // Motor, charge and inverter temperature guesses in Fahrenheit?
-      motor_temperature = 5.0 / 9.0 * (msg[1] - 32);
-      inverter_temperature = 5.0 / 9.0 * (msg[2] - 32);
+      ///motor_temperature = 5.0 / 9.0 * (msg[1] - 32);
+      ///inverter_temperature = 5.0 / 9.0 * (msg[2] - 32);
 
     } else if (msgId == 0x1da) { // Motor RPM
-      rpm = ( msg[4] << 7 | readByte(msg[5], 1, 7) );
+      ///rpm = ( msg[4] << 7 | readByte(msg[5], 1, 7) );
       
     } else if (msgId == 0x1db) { // Voltage and current
-      battery_voltage = ( (msg[2] << 2) | (msg[3] >> 6) ) / 2.0F;
+      ///battery_voltage = ( (msg[2] << 2) | (msg[3] >> 6) ) / 2.0F;
 
       // sent by the LBC, measured inside the battery box
       // current is 11 bit twos complement big endian starting at bit 0
+
+      /*
       int16_t current = ((int16_t) msg[0] << 3) | (msg[1] & 0xe0) >> 5;
       if (current & 0x0400) { // negative so extend the sign bit
         current |= 0xf800;
       }
       battery_current = -current / 2.0f;
       battery_power = (battery_current * battery_voltage)/1000.0F;
+      */
       
     } else if (msgId == 0x284) { // Speed sensors
-      leftSpeed = (msg[0] << 8) | msg[1];
-      rightSpeed = (msg[2] << 8) | msg[3];
-      rearSpeed = (msg[4] << 8) | msg[5];
+      ///leftSpeed = (msg[0] << 8) | msg[1];
+      ///rightSpeed = (msg[2] << 8) | msg[3];
+      unsigned int rearSpeed = (msg[4] << 8) | msg[5];
 
-      speed = rearSpeed / 100;
+      speed->setValue(rearSpeed / 100);
+      
+      if (bluetoothEnabled) {
+        speed->send(bt);
+      }
 
     } else if (msgId == 0x54b) { // A/C
-      ac_fan_speed = (msg[4] / 8);
+      ///ac_fan_speed = (msg[4] / 8);
 
     } else if (msgId == 0x11a) { // Shift controller (Eco, Position, On/Off)
-      eco_selected = readByte(msg[1], 4, 4);
-      status = readByte(msg[1], 6, 6);
-      gear_position = readByte(msg[0], 4, 7);
+      ///eco_selected = readByte(msg[1], 4, 4);
+      ///status = readByte(msg[1], 6, 6);
+      ///gear_position = readByte(msg[0], 4, 7);
+
+      bool status = readByte(msg[1], 6, 6);
+
+      powered->setValue(status);
+      
+      if (bluetoothEnabled) {
+        powered->send(bt);
+      }
 
     } else if (msgId == 0x5c0) { // Battery temperature
       if ( (msg[0]>>6) == 1 ) { // Checks that a value has been calculated, I think
-        battery_temperature = msg[2] / 2 - 40;
+        ///battery_temperature = msg[2] / 2 - 40;
       }
     
     } else if (msgId == 0x54c) { // Ambient temperature
       if (msg[6] != 0xff) { // Make sure it equals something
-        ambient_temperature = msg[6] / 2.0 - 40;
+        ///ambient_temperature = msg[6] / 2.0 - 40;
       }
 
     } else if (msgId == 0x1d4) {
+      /*
       int chargeStatus = readByte(msg[6], 5, 7);
       if (chargeStatus == 6 || chargeStatus == 7) {
         charging = 1;
       } else {
         charging = 0;
       }
+      */
     }
   }
   /*

@@ -1,12 +1,11 @@
-#ifndef ArdLeaf_h
-#define ArdLeaf_h
+#ifndef _ARDLEAF_H_
+#define _ARDLEAF_H_
 
 #include "Arduino.h"
 #include "mcp_can.h"
+#include "metrics.h"
 #include <SPI.h>
 #include <SoftwareSerial.h>
-
-#define MAX_GIDS 281.0F
 
 class ArdLeaf
 {
@@ -17,7 +16,12 @@ class ArdLeaf
     void update();
     void startSerial(long baud);
     void startBluetooth(int tx, int rx);
-
+    
+    MetricBool* powered;
+    MetricInt* speed;
+    MetricInt* gear;
+    MetricFloat* soc;
+    /*
     unsigned int speed;
 	  unsigned int rearSpeed;
     unsigned int leftSpeed;
@@ -44,10 +48,11 @@ class ArdLeaf
     float ambient_temperature;
     float motor_temperature;
     float inverter_temperature;
-
-  private:
+    */
     bool serialEnabled;
     bool bluetoothEnabled;
+    
+  private:
     unsigned long ms;
     unsigned long lastms;
     unsigned int sendCounter;
