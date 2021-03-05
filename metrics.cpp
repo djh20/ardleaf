@@ -9,7 +9,7 @@ MetricInt::MetricInt(int _id, int _byteCount) {
 }
 void MetricInt::setValue(unsigned int newValue) {
   if (newValue != value) {
-    Serial.print(id); Serial.print(' -> '); Serial.println(value);
+    Serial.print(id); Serial.print(" -> "); Serial.println(newValue);
     value = newValue;
     changed = true;
   }
@@ -28,7 +28,7 @@ MetricFloat::MetricFloat(int _id) {
 }
 void MetricFloat::setValue(float newValue) {
   if (newValue != value) {
-    Serial.print(id); Serial.print(' -> '); Serial.println(value);
+    Serial.print(id); Serial.print(" -> "); Serial.println(newValue);
     value = newValue;
     changed = true;
   }
@@ -48,7 +48,7 @@ MetricBool::MetricBool(int _id) {
 }
 void MetricBool::setValue(bool newValue) {
   if (newValue != value) {
-    Serial.print(id); Serial.print(' -> '); Serial.println(value);
+    Serial.print(id); Serial.print(" -> "); Serial.println(newValue);
     value = newValue;
     changed = true;
   }
