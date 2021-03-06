@@ -4,38 +4,63 @@
 #include "Arduino.h"
 #include <SoftwareSerial.h>
 
-class MetricInt {
+class Metric {
   public:
-    MetricInt(int _id, int _byteCount);
-    unsigned int value;
+    Metric(const char* n, int bytes);
+
+  public:
+    Metric* next;
+    const char* name;
+    int id;
     int byteCount;
-    void setValue(unsigned int newValue);
-    void send(SoftwareSerial *s);
-  private:
-    int id;
-    bool changed;
 };
 
-class MetricFloat {
+class MetricInt: public Metric {
   public:
-    MetricFloat(int _id);
-    float value;
-    void setValue(float newValue);
-    void send(SoftwareSerial *s);
-  private:
-    int id;
-    bool changed;
+    MetricInt(const char* n, int bytes=1);
+
+  public:
+    void setValue(int val);
+    void send(SoftwareSerial* output);
+    int value = 0;
 };
 
-class MetricBool {
+class MetricFloat: public Metric {
   public:
-    MetricBool(int _id);
-    bool value;
-    void setValue(bool newValue);
-    void send(SoftwareSerial *s);
-  private:
-    int id;
-    bool changed;
+    MetricFloat(const char* n);
+
+  public:
+    void setValue(float val);
+    void send(SoftwareSerial* output);
+    float value = 0.0f;
 };
+
+class MetricBool: public Metric {
+  public:
+    MetricBool(const char* n);
+
+  public:
+    void setValue(bool val);
+    void send(SoftwareSerial* bt);
+    bool value = false;
+};
+
+class Metrics {
+  public:
+    Metrics();
+
+  public:
+    void RegisterMetric(Metric* metric);
+    //Metric* Find(const char* name);
+
+  public:
+    Metric* first;
+    SoftwareSerial* output;
+
+  private:
+    int metricCount = 0;
+};
+
+extern Metrics MyMetrics;
 
 #endif

@@ -4,7 +4,9 @@ mcp_can_dfs	KEYWORD1
 mcp_can	KEYWORD1
 
 begin	KEYWORD2
-setSerial	KEYWORD2
+startSerial	KEYWORD2
+startCAN	KEYWORD2
+startBluetooth	KEYWORD2
 setMode	KEYWORD2
 init_Mask	KEYWORD2
 init_Filt	KEYWORD2

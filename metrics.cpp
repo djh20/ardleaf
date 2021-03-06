@@ -2,61 +2,96 @@
 #include "metrics.h"
 #include <SoftwareSerial.h>
 
-MetricInt::MetricInt(int _id, int _byteCount) {
-  id = _id;
-  byteCount = _byteCount;
-  value = 0;
-}
-void MetricInt::setValue(unsigned int newValue) {
-  if (newValue != value) {
-    Serial.print(id); Serial.print(" -> "); Serial.println(newValue);
-    value = newValue;
-    changed = true;
+Metrics MyMetrics;
+
+// metrics
+Metrics::Metrics() {}
+
+void Metrics::RegisterMetric(Metric* metric) {
+  metric->id = metricCount;
+  metricCount++;
+
+  Serial.print(metric->name);
+  Serial.print(" -> registered with id ");
+  Serial.println(metric->id);
+
+  if (first == NULL) {
+    first = metric;
+    return;
   }
-}
-void MetricInt::send(SoftwareSerial *s) {
-  if (changed) {
-    s->write(id);
-    s->write((byte *) &value, byteCount);
-    changed = false;
+
+  for (Metric* m = first; m != NULL; m=m->next) {
+    if (m->next == NULL) {
+      m->next = metric;
+      return;
+    }
   }
 }
 
-MetricFloat::MetricFloat(int _id) {
-  id = _id;
-  value = 0.0f;
-}
-void MetricFloat::setValue(float newValue) {
-  if (newValue != value) {
-    Serial.print(id); Serial.print(" -> "); Serial.println(newValue);
-    value = newValue;
-    changed = true;
-  }
-}
-void MetricFloat::send(SoftwareSerial *s) {
-  if (changed) {
-    int valueInt = value*100;
-    s->write(id);
-    s->write((byte *) &valueInt, 2);
-    changed = false;
-  }
+// metric
+Metric::Metric(const char* n, int bytes) {
+  name = n;
+  byteCount = bytes;
+  MyMetrics.RegisterMetric(this);
 }
 
-MetricBool::MetricBool(int _id) {
-  id = _id;
-  value = false;
-}
-void MetricBool::setValue(bool newValue) {
-  if (newValue != value) {
-    Serial.print(id); Serial.print(" -> "); Serial.println(newValue);
-    value = newValue;
-    changed = true;
+// int
+MetricInt::MetricInt(const char* n, int bytes=1) : Metric(n, bytes) {}
+
+void MetricInt::setValue(int val) {
+  if (value != val) { // check new value is different to current value
+    value = val;
+
+    Serial.print(name);
+    Serial.print(" -> set to ");
+    Serial.println(val);
+
+    send(MyMetrics.output);
   }
 }
-void MetricBool::send(SoftwareSerial *s) {
-  if (changed) {
-    s->write(id);
-    s->write(value);
-    changed = false;
+void MetricInt::send(SoftwareSerial* output) {
+  if (output == NULL) return;
+  output->write(id);
+  output->write((byte *) &value, byteCount);
+}
+
+// float
+MetricFloat::MetricFloat(const char* n) : Metric(n, 2) {}
+
+void MetricFloat::setValue(float val) {
+  if (value != val) { // check new value is different to current value
+    value = val;
+
+    Serial.print(name);
+    Serial.print(" -> set to ");
+    Serial.println(val);
+
+    send(MyMetrics.output);
   }
+}
+void MetricFloat::send(SoftwareSerial* output) {
+  if (output == NULL) return;
+  int valueInt = value*100;
+  output->write(id);
+  output->write((byte *) &valueInt, byteCount);
+}
+
+// bool
+MetricBool::MetricBool(const char* n) : Metric(n, 1) {}
+
+void MetricBool::setValue(bool val) {
+  if (value != val) { // check new value is different to current value
+    value = val;
+
+    Serial.print(name);
+    Serial.print(" -> set to ");
+    Serial.println(val ? "true" : "false");
+
+    send(MyMetrics.output);
+  }
+}
+void MetricBool::send(SoftwareSerial* output) {
+  if (output == NULL) return;
+  output->write(id);
+  output->write(value);
 }

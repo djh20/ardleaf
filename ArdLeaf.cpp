@@ -5,43 +5,77 @@
 #include <SPI.h>
 #include <SoftwareSerial.h>
 
-ArdLeaf::ArdLeaf(int pin_cs, int pin_int) {
-  canEV = new MCP_CAN(pin_cs);
-  pinMode(pin_int, INPUT);
-
-  pinCS = pin_cs;
-  pinINT = pin_int;
-
-  //speed = new PropertyInt(1);
+ArdLeaf::ArdLeaf() {
+  
+  /*
   powered = new MetricBool(1);
   speed = new MetricInt(2, 1);
   gear = new MetricInt(3, 1);
   soc = new MetricFloat(4);
+  energy = new MetricFloat(5);
+  */
 }
 
-void ArdLeaf::connect() {
-  Serial.print("Connecting to CAN...  ");
+void ArdLeaf::begin() {
+  powered = new MetricBool("powered");
+  speed = new MetricInt("speed");
+  gear = new MetricInt("gear");
+  soc = new MetricFloat("soc");
+  energy = new MetricFloat("energy");
+}
+
+void ArdLeaf::startCAN(int pin_cs, int pin_int) {
+  Serial.print("connecting to can...  ");
+
+  canEV = new MCP_CAN(pin_cs);
+  pinMode(pin_int, INPUT);
   
   if(canEV->begin(MCP_ANY, CAN_500KBPS, MCP_8MHZ) == CAN_OK) {
-    Serial.println("Connected!");
+    Serial.println("success :)");
+    canEV->setMode(MCP_NORMAL);
+    pinINT = pin_int;
+    canEnabled = true;
   } else {
-    Serial.println("Error!");
+    Serial.println("error!");
   }
+}
 
-  canEV->setMode(MCP_NORMAL);
+void ArdLeaf::startSerial(long baud) {
+  Serial.begin(baud);
+  serialEnabled = true;
+}
+
+void ArdLeaf::startBluetooth(int tx, int rx) {
+  bt = new SoftwareSerial(tx, rx);
+  bt->begin(9600);
+  bluetoothEnabled = true;
+
+  MyMetrics.output = bt;
 }
 
 void ArdLeaf::update() {
-  /*
+  
   if (Serial.available() > 0) {
     int input = Serial.read();
+    //counter++;
+
+    powered->setValue(true);
+    speed->setValue(24);
+    gear->setValue(4);
+    soc->setValue(50.7f);
+    energy->setValue(76.3f);
+
+    //speed->setValue(speed->value+1);
+
+
+    //speed->setValue(speed->value+1);
     //Serial.println(input, DEC);
     //soc->setValue(soc->value+0.5f);
     //soc->send(bt);
   }
-  */
   
-  if( !digitalRead(pinINT) ) { // Check if data is available
+  
+  if( canEnabled && !digitalRead(pinINT) ) { // Check if data is available
     canEV->readMsgBuf(&msgId, &msgLen, msg);
     if (msgId == 0x5bc) { // SOC (With degradation)
       ///soc_gids = (msg[0] << 2) | (msg[1] >> 6);
@@ -51,11 +85,12 @@ void ArdLeaf::update() {
     } else if (msgId == 0x55b) { // SOC (Without degradation)
       float soc_percent = ( (msg[0] << 2) | (msg[1] >> 6) ) / 10.0F;
 
+      /*
       soc->setValue(soc_percent);
-
       if (bluetoothEnabled) {
         soc->send(bt);
       }
+      */
 
     } else if (msgId == 0x55a) { // Motor & inverter temperatures
       // Motor, charge and inverter temperature guesses in Fahrenheit?
@@ -85,11 +120,12 @@ void ArdLeaf::update() {
       ///rightSpeed = (msg[2] << 8) | msg[3];
       unsigned int rearSpeed = (msg[4] << 8) | msg[5];
 
+      /*
       speed->setValue(rearSpeed / 100);
-      
       if (bluetoothEnabled) {
         speed->send(bt);
       }
+      */
 
     } else if (msgId == 0x54b) { // A/C
       ///ac_fan_speed = (msg[4] / 8);
@@ -101,11 +137,12 @@ void ArdLeaf::update() {
 
       bool status = readByte(msg[1], 6, 6);
 
+      /*
       powered->setValue(status);
-      
       if (bluetoothEnabled) {
         powered->send(bt);
       }
+      */
 
     } else if (msgId == 0x5c0) { // Battery temperature
       if ( (msg[0]>>6) == 1 ) { // Checks that a value has been calculated, I think
@@ -179,15 +216,4 @@ void ArdLeaf::printBinary(byte inByte, int len){
     Serial.print(bitRead(inByte, b));
   }
   Serial.println();
-}
-
-void ArdLeaf::startSerial(long baud) {
-  Serial.begin(baud);
-  serialEnabled = true;
-}
-
-void ArdLeaf::startBluetooth(int tx, int rx) {
-  bt = new SoftwareSerial(tx, rx);
-  bt->begin(9600);
-  bluetoothEnabled = true;
 }
