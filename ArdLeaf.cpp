@@ -22,6 +22,7 @@ void ArdLeaf::begin() {
   gear = new MetricInt("gear");
   soc = new MetricFloat("soc");
   energy = new MetricFloat("energy");
+  ac_speed = new MetricInt("ac_speed");
 }
 
 void ArdLeaf::startCAN(int pin_cs, int pin_int) {
@@ -120,7 +121,9 @@ void ArdLeaf::update() {
       speed->setValue(rearSpeed / 100);
 
     } else if (msgId == 0x54b) { // A/C
-      ///ac_fan_speed = (msg[4] / 8);
+      int fanSpeed = (msg[4] / 8);
+
+      ac_speed->setValue(fanSpeed);
 
     } else if (msgId == 0x11a) { // Shift controller (Eco, Position, On/Off)
       ///eco_selected = readByte(msg[1], 4, 4);
