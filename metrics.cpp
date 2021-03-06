@@ -36,7 +36,7 @@ Metric::Metric(const char* n, int bytes) {
 }
 
 // int
-MetricInt::MetricInt(const char* n, int bytes=1) : Metric(n, bytes) {}
+MetricInt::MetricInt(const char* n, int bytes) : Metric(n, bytes) {}
 
 void MetricInt::setValue(int val) {
   if (value != val) { // check new value is different to current value
