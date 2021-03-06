@@ -59,11 +59,13 @@ void ArdLeaf::update() {
     int input = Serial.read();
     //counter++;
 
+    /*
     powered->setValue(true);
     speed->setValue(24);
     gear->setValue(4);
     soc->setValue(50.7f);
     energy->setValue(76.3f);
+    */
 
     //speed->setValue(speed->value+1);
 
@@ -84,13 +86,8 @@ void ArdLeaf::update() {
 
     } else if (msgId == 0x55b) { // SOC (Without degradation)
       float soc_percent = ( (msg[0] << 2) | (msg[1] >> 6) ) / 10.0F;
-
-      /*
+      
       soc->setValue(soc_percent);
-      if (bluetoothEnabled) {
-        soc->send(bt);
-      }
-      */
 
     } else if (msgId == 0x55a) { // Motor & inverter temperatures
       // Motor, charge and inverter temperature guesses in Fahrenheit?
@@ -101,31 +98,26 @@ void ArdLeaf::update() {
       ///rpm = ( msg[4] << 7 | readByte(msg[5], 1, 7) );
       
     } else if (msgId == 0x1db) { // Voltage and current
-      ///battery_voltage = ( (msg[2] << 2) | (msg[3] >> 6) ) / 2.0F;
+      float battery_voltage = ( (msg[2] << 2) | (msg[3] >> 6) ) / 2.0F;
 
       // sent by the LBC, measured inside the battery box
       // current is 11 bit twos complement big endian starting at bit 0
 
-      /*
       int16_t current = ((int16_t) msg[0] << 3) | (msg[1] & 0xe0) >> 5;
       if (current & 0x0400) { // negative so extend the sign bit
         current |= 0xf800;
       }
-      battery_current = -current / 2.0f;
-      battery_power = (battery_current * battery_voltage)/1000.0F;
-      */
+      float battery_current = -current / 2.0f;
+      float battery_power = (battery_current * battery_voltage)/1000.0F;
+      
+      energy->setValue(battery_power);
       
     } else if (msgId == 0x284) { // Speed sensors
       ///leftSpeed = (msg[0] << 8) | msg[1];
       ///rightSpeed = (msg[2] << 8) | msg[3];
       unsigned int rearSpeed = (msg[4] << 8) | msg[5];
 
-      /*
       speed->setValue(rearSpeed / 100);
-      if (bluetoothEnabled) {
-        speed->send(bt);
-      }
-      */
 
     } else if (msgId == 0x54b) { // A/C
       ///ac_fan_speed = (msg[4] / 8);
@@ -133,16 +125,11 @@ void ArdLeaf::update() {
     } else if (msgId == 0x11a) { // Shift controller (Eco, Position, On/Off)
       ///eco_selected = readByte(msg[1], 4, 4);
       ///status = readByte(msg[1], 6, 6);
-      ///gear_position = readByte(msg[0], 4, 7);
-
+      int gearPosition = readByte(msg[0], 4, 7);
       bool status = readByte(msg[1], 6, 6);
 
-      /*
+      gear->setValue(gearPosition);
       powered->setValue(status);
-      if (bluetoothEnabled) {
-        powered->send(bt);
-      }
-      */
 
     } else if (msgId == 0x5c0) { // Battery temperature
       if ( (msg[0]>>6) == 1 ) { // Checks that a value has been calculated, I think
