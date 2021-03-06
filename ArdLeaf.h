@@ -34,7 +34,7 @@ class ArdLeaf
     MetricInt* gear;
     MetricFloat* soc;
     MetricFloat* energy;
-    MetricInt* ac_speed;
+    MetricInt* climate_fan_speed;
 
     int pinINT;
 
