@@ -9,6 +9,9 @@ class Metric {
     Metric(const char* n, int bytes);
 
   public:
+    virtual void send(SoftwareSerial* output);
+
+  public:
     Metric* next;
     const char* name;
     int id;
@@ -51,6 +54,7 @@ class Metrics {
 
   public:
     void RegisterMetric(Metric* metric);
+    void SendAll();
     //Metric* Find(const char* name);
 
   public:

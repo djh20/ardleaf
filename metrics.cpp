@@ -27,6 +27,11 @@ void Metrics::RegisterMetric(Metric* metric) {
     }
   }
 }
+void Metrics::SendAll() {
+  for (Metric* m = first; m != NULL; m=m->next) {
+    m->send(output);
+  }
+}
 
 // metric
 Metric::Metric(const char* n, int bytes) {
@@ -34,6 +39,7 @@ Metric::Metric(const char* n, int bytes) {
   byteCount = bytes;
   MyMetrics.RegisterMetric(this);
 }
+void Metric::send(SoftwareSerial* output) {}
 
 // int
 MetricInt::MetricInt(const char* n, int bytes) : Metric(n, bytes) {}

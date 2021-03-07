@@ -5,23 +5,16 @@
 #include <SPI.h>
 #include <SoftwareSerial.h>
 
-ArdLeaf::ArdLeaf() {
-  
-  /*
-  powered = new MetricBool(1);
-  speed = new MetricInt(2, 1);
-  gear = new MetricInt(3, 1);
-  soc = new MetricFloat(4);
-  energy = new MetricFloat(5);
-  */
-}
+ArdLeaf::ArdLeaf() {}
 
 void ArdLeaf::begin() {
   powered = new MetricBool("powered");
   speed = new MetricInt("speed");
   gear = new MetricInt("gear");
+  eco = new MetricBool("eco");
   soc = new MetricFloat("soc");
   energy = new MetricFloat("energy");
+  charging = new MetricBool("charging");
   climate_fan_speed = new MetricInt("climate_fan_speed");
 }
 
@@ -58,25 +51,11 @@ void ArdLeaf::update() {
   
   if (Serial.available() > 0) {
     int input = Serial.read();
-    //counter++;
-
-    /*
-    powered->setValue(true);
-    speed->setValue(24);
-    gear->setValue(4);
-    soc->setValue(50.7f);
-    energy->setValue(76.3f);
-    */
-
-    //speed->setValue(speed->value+1);
-
-
-    //speed->setValue(speed->value+1);
-    //Serial.println(input, DEC);
-    //soc->setValue(soc->value+0.5f);
-    //soc->send(bt);
+    if (input == 97) { // (lowercase a) command to send all metrics to bluetooth
+      Serial.println("Sending all metrics...");
+      MyMetrics.SendAll();
+    }
   }
-  
   
   if( canEnabled && !digitalRead(pinINT) ) { // Check if data is available
     canEV->readMsgBuf(&msgId, &msgLen, msg);
@@ -111,7 +90,9 @@ void ArdLeaf::update() {
       float battery_current = -current / 2.0f;
       float battery_power = (battery_current * battery_voltage)/1000.0F;
       
-      energy->setValue(battery_power);
+      if (powered->value) { // Only send if the car is on
+        energy->setValue(battery_power);
+      }
       
     } else if (msgId == 0x284) { // Speed sensors
       ///leftSpeed = (msg[0] << 8) | msg[1];
@@ -125,14 +106,14 @@ void ArdLeaf::update() {
 
       climate_fan_speed->setValue(fanSpeed);
 
-    } else if (msgId == 0x11a) { // Shift controller (Eco, Position, On/Off)
-      ///eco_selected = readByte(msg[1], 4, 4);
-      ///status = readByte(msg[1], 6, 6);
-      int gearPosition = readByte(msg[0], 4, 7);
+    } else if (msgId == 0x11a) { // Shift controller (Eco, Gear, On/Off)
       bool status = readByte(msg[1], 6, 6);
-
-      gear->setValue(gearPosition);
+      bool ecoSelected = readByte(msg[1], 4, 4);
+      int gearPosition = readByte(msg[0], 4, 7);
+      
       powered->setValue(status);
+      gear->setValue(gearPosition);
+      eco->setValue(ecoSelected);
 
     } else if (msgId == 0x5c0) { // Battery temperature
       if ( (msg[0]>>6) == 1 ) { // Checks that a value has been calculated, I think
@@ -145,14 +126,10 @@ void ArdLeaf::update() {
       }
 
     } else if (msgId == 0x1d4) {
-      /*
-      int chargeStatus = readByte(msg[6], 5, 7);
-      if (chargeStatus == 6 || chargeStatus == 7) {
-        charging = 1;
-      } else {
-        charging = 0;
-      }
-      */
+      int chargeValue = readByte(msg[6], 5, 7);
+      bool chargeStatus = (chargeValue == 6 || chargeValue == 7) ? true : false;
+
+      charging->setValue(chargeStatus);
     }
   }
   /*
