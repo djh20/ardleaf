@@ -132,31 +132,6 @@ void ArdLeaf::update() {
       charging->setValue(chargeStatus);
     }
   }
-  /*
-  if (bluetoothEnabled) {
-    ms = millis();
-
-    if (ms-lastms > 100) {
-      lastms = ms;
-      sendCounter++;
-
-      bt.print(speed); bt.print(',');
-      bt.print(battery_power);
-      
-      if (sendCounter >= 10) {
-        sendCounter = 0;
-        bt.print(',');
-        bt.print(status); bt.print(',');
-        bt.print(gear_position); bt.print(',');
-        bt.print(soc);
-      } else {
-        bt.print(',');
-      }
-
-      bt.println();
-    }
-  }
-  */
 }
 
 byte ArdLeaf::readByte(byte b, int pStart, int pEnd) {
