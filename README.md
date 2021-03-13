@@ -11,7 +11,8 @@ This repository contains files from the MCP_CAN library by coryjfowler https://g
 
 ## Examples
 This library contains a few example sketches. They can be found at **File > Examples > ArdLeaf.**
-One of the examples shows how to use bluetooth for sending the data.
+All of the examples print data to the serial monitor.
+The "ArdLeaf_Bluetooth" example uses a HC-05 module to send data through bluetooth.
 
 ### Important
 This library is being developed on a 2011 Nissan Leaf ZE0, it most likely won't work on later leaf models.
