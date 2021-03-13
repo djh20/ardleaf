@@ -49,11 +49,16 @@ void ArdLeaf::startBluetooth(int tx, int rx) {
 }
 
 void ArdLeaf::update() {
-  
   if (Serial.available() > 0) {
     int input = Serial.read();
-    if (input == 97) { // (lowercase a) command to send all metrics to bluetooth
-      Serial.println("Sending all metrics...");
+    if (input == 97) { // (lowercase a) command to send all metrics
+      MyMetrics.SendAll();
+    }
+  }
+
+  if (bluetoothEnabled && bt->available() > 0) {
+    int data = bt->read();
+    if (data == 1) { // command 1 (send all metrics)
       MyMetrics.SendAll();
     }
   }
