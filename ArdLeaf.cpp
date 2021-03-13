@@ -13,6 +13,7 @@ void ArdLeaf::begin() {
   gear = new MetricInt("gear");
   eco = new MetricBool("eco");
   soc = new MetricFloat("soc");
+  gids = new MetricInt("gids");
   energy = new MetricFloat("energy");
   charging = new MetricBool("charging");
   climate_fan_speed = new MetricInt("climate_fan_speed");
@@ -60,7 +61,9 @@ void ArdLeaf::update() {
   if( canEnabled && !digitalRead(pinINT) ) { // Check if data is available
     canEV->readMsgBuf(&msgId, &msgLen, msg);
     if (msgId == 0x5bc) { // SOC (With degradation)
-      ///soc_gids = (msg[0] << 2) | (msg[1] >> 6);
+      int soc_gids = (msg[0] << 2) | (msg[1] >> 6);
+
+      gids->setValue(soc_gids);
       ///soc_gids_percent = (soc_gids / MAX_GIDS) * 100.0F;
       ///soh = readByte(msg[4], 1, 7);
 
