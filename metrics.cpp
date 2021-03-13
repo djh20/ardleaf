@@ -47,15 +47,14 @@ MetricInt::MetricInt(const char* n, int bytes) : Metric(n, bytes) {}
 void MetricInt::setValue(int val) {
   if (value != val) { // check new value is different to current value
     value = val;
-
-    Serial.print(name);
-    Serial.print(" -> set to ");
-    Serial.println(val);
-
     send(MyMetrics.output);
   }
 }
 void MetricInt::send(SoftwareSerial* output) {
+  Serial.print(name);
+  Serial.print(" -> ");
+  Serial.println(value);
+
   if (output == NULL) return;
   output->write(id);
   output->write((byte *) &value, byteCount);
@@ -67,15 +66,14 @@ MetricFloat::MetricFloat(const char* n) : Metric(n, 2) {}
 void MetricFloat::setValue(float val) {
   if (value != val) { // check new value is different to current value
     value = val;
-
-    Serial.print(name);
-    Serial.print(" -> set to ");
-    Serial.println(val);
-
     send(MyMetrics.output);
   }
 }
 void MetricFloat::send(SoftwareSerial* output) {
+  Serial.print(name);
+  Serial.print(" -> ");
+  Serial.println(value);
+
   if (output == NULL) return;
   int valueInt = value*100;
   output->write(id);
@@ -88,15 +86,14 @@ MetricBool::MetricBool(const char* n) : Metric(n, 1) {}
 void MetricBool::setValue(bool val) {
   if (value != val) { // check new value is different to current value
     value = val;
-
-    Serial.print(name);
-    Serial.print(" -> set to ");
-    Serial.println(val ? "true" : "false");
-
     send(MyMetrics.output);
   }
 }
 void MetricBool::send(SoftwareSerial* output) {
+  Serial.print(name);
+  Serial.print(" -> ");
+  Serial.println(value ? "true" : "false");
+
   if (output == NULL) return;
   output->write(id);
   output->write(value);
