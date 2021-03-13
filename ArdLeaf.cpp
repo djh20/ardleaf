@@ -63,7 +63,9 @@ void ArdLeaf::update() {
     if (msgId == 0x5bc) { // SOC (With degradation)
       int soc_gids = (msg[0] << 2) | (msg[1] >> 6);
 
-      gids->setValue(soc_gids);
+      if (soc_gids < 1000) { // gids shows incorrect value of 1023 during startup
+        gids->setValue(soc_gids);
+      }
       ///soc_gids_percent = (soc_gids / MAX_GIDS) * 100.0F;
       ///soh = readByte(msg[4], 1, 7);
 
