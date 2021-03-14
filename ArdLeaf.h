@@ -38,6 +38,8 @@ class ArdLeaf
     MetricFloat* energy;
     MetricBool* charging;
     MetricInt* climate_fan_speed;
+    
+    MetricFloat* inverter_temp;
 
     int pinINT;
 

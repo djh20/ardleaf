@@ -17,6 +17,8 @@ void ArdLeaf::begin() {
   energy = new MetricFloat("energy");
   charging = new MetricBool("charging");
   climate_fan_speed = new MetricInt("climate_fan_speed");
+
+  inverter_temp = new MetricFloat("inverter_temp");
 }
 
 void ArdLeaf::startCAN(int pin_cs, int pin_int) {
@@ -82,7 +84,9 @@ void ArdLeaf::update() {
     } else if (msgId == 0x55a) { // Motor & inverter temperatures
       // Motor, charge and inverter temperature guesses in Fahrenheit?
       ///motor_temperature = 5.0 / 9.0 * (msg[1] - 32);
-      ///inverter_temperature = 5.0 / 9.0 * (msg[2] - 32);
+      float inverter = 5.0 / 9.0 * (msg[2] - 32);
+
+      inverter_temp->setValue(inverter);
 
     } else if (msgId == 0x1da) { // Motor RPM
       ///rpm = ( msg[4] << 7 | readByte(msg[5], 1, 7) );
