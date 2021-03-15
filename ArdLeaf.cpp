@@ -9,7 +9,11 @@ ArdLeaf::ArdLeaf() {}
 
 void ArdLeaf::begin() {
   powered = new MetricBool("powered");
+
   speed = new MetricInt("speed");
+  left_speed = new MetricInt("left_speed", 2);
+  right_speed = new MetricInt("right_speed", 2);
+
   gear = new MetricInt("gear");
   eco = new MetricBool("eco");
   soc = new MetricFloat("soc");
@@ -19,6 +23,7 @@ void ArdLeaf::begin() {
   climate_fan_speed = new MetricInt("climate_fan_speed");
 
   inverter_temp = new MetricFloat("inverter_temp");
+  motor_temp = new MetricFloat("motor_temp");
 }
 
 void ArdLeaf::startCAN(int pin_cs, int pin_int) {
@@ -66,6 +71,7 @@ void ArdLeaf::update() {
   }
   
   if( canEnabled && !digitalRead(pinINT) ) { // Check if data is available
+    ms = millis();
     canEV->readMsgBuf(&msgId, &msgLen, msg);
     if (msgId == 0x5bc) { // SOC (With degradation)
       int soc_gids = (msg[0] << 2) | (msg[1] >> 6);
@@ -83,9 +89,10 @@ void ArdLeaf::update() {
 
     } else if (msgId == 0x55a) { // Motor & inverter temperatures
       // Motor, charge and inverter temperature guesses in Fahrenheit?
-      ///motor_temperature = 5.0 / 9.0 * (msg[1] - 32);
+      float motor = 5.0 / 9.0 * (msg[1] - 32);
       float inverter = 5.0 / 9.0 * (msg[2] - 32);
 
+      motor_temp->setValue(motor);
       inverter_temp->setValue(inverter);
 
     } else if (msgId == 0x1da) { // Motor RPM
@@ -104,16 +111,21 @@ void ArdLeaf::update() {
       float battery_current = -current / 2.0f;
       float battery_power = (battery_current * battery_voltage)/1000.0F;
       
-      if (powered->value) { // Only send if the car is on
+      if (powered->value && ms-80 >= energy->lastUpdate) { // Only set if the car is on and it's been atleast 80ms since last update
         energy->setValue(battery_power);
       }
       
     } else if (msgId == 0x284) { // Speed sensors
-      ///leftSpeed = (msg[0] << 8) | msg[1];
-      ///rightSpeed = (msg[2] << 8) | msg[3];
+      unsigned int leftSpeed = (msg[0] << 8) | msg[1];
+      unsigned int rightSpeed = (msg[2] << 8) | msg[3];
       unsigned int rearSpeed = (msg[4] << 8) | msg[5];
 
       speed->setValue(rearSpeed / 100);
+
+      if (ms-100 >= left_speed->lastUpdate) left_speed->setValue(leftSpeed / 10);
+      if (ms-100 >= right_speed->lastUpdate) right_speed->setValue(rightSpeed / 10);
+
+      // divide by 208 for correct speed
 
     } else if (msgId == 0x54b) { // Climate
       int fanSpeed = (msg[4] / 8);

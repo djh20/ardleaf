@@ -45,6 +45,7 @@ void Metric::send(SoftwareSerial* output) {}
 MetricInt::MetricInt(const char* n, int bytes) : Metric(n, bytes) {}
 
 void MetricInt::setValue(int val) {
+  lastUpdate = millis();
   if (value != val) { // check new value is different to current value
     value = val;
     send(MyMetrics.output);
@@ -64,6 +65,7 @@ void MetricInt::send(SoftwareSerial* output) {
 MetricFloat::MetricFloat(const char* n) : Metric(n, 2) {}
 
 void MetricFloat::setValue(float val) {
+  lastUpdate = millis();
   if (value != val) { // check new value is different to current value
     value = val;
     send(MyMetrics.output);
@@ -84,6 +86,7 @@ void MetricFloat::send(SoftwareSerial* output) {
 MetricBool::MetricBool(const char* n) : Metric(n, 1) {}
 
 void MetricBool::setValue(bool val) {
+  lastUpdate = millis();
   if (value != val) { // check new value is different to current value
     value = val;
     send(MyMetrics.output);

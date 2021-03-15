@@ -30,7 +30,11 @@ class ArdLeaf
     
   private:
     MetricBool* powered;
+
     MetricInt* speed;
+    MetricInt* left_speed;
+    MetricInt* right_speed;
+
     MetricInt* gear;
     MetricBool* eco;
     MetricFloat* soc;
@@ -40,6 +44,7 @@ class ArdLeaf
     MetricInt* climate_fan_speed;
     
     MetricFloat* inverter_temp;
+    MetricFloat* motor_temp;
 
     int pinINT;
 
@@ -47,6 +52,7 @@ class ArdLeaf
     unsigned char msg[8]; // CAN 8 byte buffer
     unsigned char msgLen = 0;  // CAN data length
     char out[128]; // Serial out
+    unsigned long ms;
 
     MCP_CAN* canEV;
     SoftwareSerial* bt;
