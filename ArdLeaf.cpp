@@ -88,17 +88,29 @@ void ArdLeaf::update() {
       gps->encode( gpsSerial->read() );
     }
 
-    if ( ms >= gpsLastUpdate+2000 && gps->location.isValid() ) {
+    if ( ms >= gpsLastUpdate+3000 && gps->location.isValid() ) {
       double latitude = gps->location.lat();
       double longitude = gps->location.lng();
 
-      if (gpsLastLatitude != NULL && gpsLastLongitude != NULL && powered->value) {
+      Serial.print(latitude, 6);
+      Serial.print(", "); 
+      Serial.println(longitude, 6);
+
+      if (gpsLastLatitude != NULL && gpsLastLongitude != NULL && powered->value && gear->value != 1 && gear->value != 0) {
         float distance = TinyGPSPlus::distanceBetween(
           latitude, longitude,
           gpsLastLatitude, gpsLastLongitude
         );
-        tripDistance += distance/1000; // convert m to km
-        trip_distance->setValue((int) tripDistance);
+
+        Serial.print("distance: "); Serial.println(distance);
+
+        if (distance >= 0.3) { 
+          // to try and correct for gps wandering (when not moving).
+          // this isn't a very good way of doing it, it should probably be changed.
+
+          tripDistance += distance/1000; // convert m to km
+          trip_distance->setValue((int) tripDistance);
+        }
       }
 
       gpsLastLatitude = latitude;
