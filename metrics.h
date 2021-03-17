@@ -14,7 +14,7 @@ class Metric {
   public:
     Metric* next;
     const char* name;
-    unsigned long lastUpdate;
+    unsigned long lastUpdate = 0;
     int id;
     int byteCount;
 };
