@@ -80,9 +80,9 @@ void ArdLeaf::update() {
 
   if (bluetoothEnabled && bt->available() > 0) {
     int data = bt->read();
-    if (data == 1) { // command 1 (send all metrics)
+    //if (data == 1) { // command 1 (send all metrics)
       MyMetrics.SendAll();
-    }
+    //}
   }
 
   if (gpsEnabled) {
@@ -106,11 +106,11 @@ void ArdLeaf::update() {
 
         Serial.print("distance: "); Serial.println(distance);
 
-        if (distance >= 0.3) { 
+        if (distance >= 0.3 && distance <= 1000) { 
           // to try and correct for gps wandering (when not moving).
           // this isn't a very good way of doing it, it should probably be changed.
 
-          tripDistance += distance; // convert m to km
+          tripDistance += distance;
           trip_distance->setValue((int) tripDistance/100); // reduce size of tripDistance variable for bluetooth
         }
       }
@@ -166,8 +166,8 @@ void ArdLeaf::update() {
       }
       
     } else if (msgId == 0x284) { // Speed sensors
-      unsigned int leftSpeed = (msg[0] << 8) | msg[1];
-      unsigned int rightSpeed = (msg[2] << 8) | msg[3];
+      unsigned int rightSpeed = (msg[0] << 8) | msg[1];
+      unsigned int leftSpeed = (msg[2] << 8) | msg[3];
       unsigned int rearSpeed = (msg[4] << 8) | msg[5];
 
       speed->setValue(rearSpeed / 100);
