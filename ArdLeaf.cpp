@@ -25,7 +25,7 @@ void ArdLeaf::begin() {
 
   inverter_temp = new MetricFloat("inverter_temp");
   motor_temp = new MetricFloat("motor_temp");
-  trip_distance = new MetricInt("trip_distance");
+  trip_distance = new MetricInt("trip_distance", 2);
 }
 
 void ArdLeaf::startCAN(int pin_cs, int pin_int) {
@@ -73,6 +73,8 @@ void ArdLeaf::update() {
     int input = Serial.read();
     if (input == 97) { // (lowercase a) command to send all metrics
       MyMetrics.SendAll();
+    } else if (input == 98) { // (lowercase b) test command
+      trip_distance->setValue(163);
     }
   }
 
@@ -108,8 +110,8 @@ void ArdLeaf::update() {
           // to try and correct for gps wandering (when not moving).
           // this isn't a very good way of doing it, it should probably be changed.
 
-          tripDistance += distance/1000; // convert m to km
-          trip_distance->setValue((int) tripDistance);
+          tripDistance += distance; // convert m to km
+          trip_distance->setValue((int) tripDistance/100); // reduce size of tripDistance variable for bluetooth
         }
       }
 
