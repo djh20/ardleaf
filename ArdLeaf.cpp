@@ -1,7 +1,8 @@
 #include "Arduino.h"
 #include "ArdLeaf.h"
-#include "mcp_can.h"
 #include "metrics.h"
+#include "mcp_can.h"
+#include "gps.h"
 #include <SPI.h>
 #include <SoftwareSerial.h>
 
@@ -24,6 +25,7 @@ void ArdLeaf::begin() {
 
   inverter_temp = new MetricFloat("inverter_temp");
   motor_temp = new MetricFloat("motor_temp");
+  trip_distance = new MetricInt("trip_distance");
 }
 
 void ArdLeaf::startCAN(int pin_cs, int pin_int) {
@@ -55,7 +57,18 @@ void ArdLeaf::startBluetooth(int tx, int rx) {
   MyMetrics.output = bt;
 }
 
+void ArdLeaf::startGPS(int tx, int rx) {
+  gps = new TinyGPSPlus();
+
+  gpsSerial = new SoftwareSerial(tx, rx);
+  gpsSerial->begin(9600);
+  
+  gpsEnabled = true;
+}
+
 void ArdLeaf::update() {
+  ms = millis();
+
   if (Serial.available() > 0) {
     int input = Serial.read();
     if (input == 97) { // (lowercase a) command to send all metrics
@@ -69,9 +82,32 @@ void ArdLeaf::update() {
       MyMetrics.SendAll();
     }
   }
+
+  if (gpsEnabled) {
+    while (gpsSerial->available() > 0) {
+      gps->encode( gpsSerial->read() );
+    }
+
+    if ( ms >= gpsLastUpdate+2000 && gps->location.isValid() ) {
+      double latitude = gps->location.lat();
+      double longitude = gps->location.lng();
+
+      if (gpsLastLatitude != NULL && gpsLastLongitude != NULL && powered->value) {
+        float distance = TinyGPSPlus::distanceBetween(
+          latitude, longitude,
+          gpsLastLatitude, gpsLastLongitude
+        );
+        tripDistance += distance/1000; // convert m to km
+        trip_distance->setValue((int) tripDistance);
+      }
+
+      gpsLastLatitude = latitude;
+      gpsLastLongitude = longitude;
+      gpsLastUpdate = ms;
+    }
+  }
   
   if( canEnabled && !digitalRead(pinINT) ) { // Check if data is available
-    ms = millis();
     canEV->readMsgBuf(&msgId, &msgLen, msg);
     if (msgId == 0x5bc) { // SOC (With degradation)
       int soc_gids = (msg[0] << 2) | (msg[1] >> 6);
@@ -111,7 +147,7 @@ void ArdLeaf::update() {
       float battery_current = -current / 2.0f;
       float battery_power = (battery_current * battery_voltage)/1000.0F;
       
-      if (powered->value && ms-80 >= energy->lastUpdate) { // Only set if the car is on and it's been atleast 80ms since last update
+      if (powered->value && ms >= energy->lastUpdate+80) { // Only set if the car is on and it's been atleast 80ms since last update
         energy->setValue(battery_power);
       }
       
@@ -122,8 +158,8 @@ void ArdLeaf::update() {
 
       speed->setValue(rearSpeed / 100);
 
-      if (ms-100 >= left_speed->lastUpdate) left_speed->setValue(leftSpeed / 10);
-      if (ms-100 >= right_speed->lastUpdate) right_speed->setValue(rightSpeed / 10);
+      if (ms >= left_speed->lastUpdate+100) left_speed->setValue(leftSpeed / 10);
+      if (ms >= right_speed->lastUpdate+100) right_speed->setValue(rightSpeed / 10);
 
       // divide by 208 for correct speed
 

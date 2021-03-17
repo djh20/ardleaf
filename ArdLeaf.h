@@ -2,8 +2,9 @@
 #define _ARDLEAF_H_
 
 #include "Arduino.h"
-#include "mcp_can.h"
 #include "metrics.h"
+#include "mcp_can.h"
+#include "gps.h"
 #include <SPI.h>
 #include <SoftwareSerial.h>
 
@@ -18,6 +19,7 @@ class ArdLeaf
     void startCAN(int pin_cs, int pin_int);
     void startSerial(long baud);
     void startBluetooth(int tx, int rx);
+    void startGPS(int tx, int rx);
 
   private:
     byte readByte(byte b, int pStart, int pEnd);
@@ -27,6 +29,7 @@ class ArdLeaf
     bool canEnabled;
     bool serialEnabled;
     bool bluetoothEnabled;
+    bool gpsEnabled;
     
   private:
     MetricBool* powered;
@@ -46,6 +49,8 @@ class ArdLeaf
     MetricFloat* inverter_temp;
     MetricFloat* motor_temp;
 
+    MetricInt* trip_distance;
+
     int pinINT;
 
     long unsigned int msgId; // CAN message ID
@@ -55,7 +60,15 @@ class ArdLeaf
     unsigned long ms;
 
     MCP_CAN* canEV;
+    TinyGPSPlus* gps;
+
+    SoftwareSerial* gpsSerial;
     SoftwareSerial* bt;
+    
+    unsigned long gpsLastUpdate = 0;
+    double gpsLastLatitude;
+    double gpsLastLongitude;
+    float tripDistance = 0;
 };
 
 #endif
