@@ -3,7 +3,7 @@
 ArdLeaf leaf;
 
 void setup() {
-  leaf.startSerial(9600);
+  leaf.startSerial(115200);
   leaf.startCAN(D8, D2); // CS, INT (pins)
   leaf.startBluetooth(D4, D3); // TX, RX
   leaf.startGPS(D1, D0); // TX, RX

@@ -3,7 +3,7 @@
 ArdLeaf leaf;
 
 void setup() {
-  leaf.startSerial(9600);
+  leaf.startSerial(115200);
   leaf.startCAN(D8, D2); // CS, INT (pins)
   leaf.begin();
 }
