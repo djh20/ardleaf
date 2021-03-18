@@ -29,39 +29,59 @@ void ArdLeaf::begin() {
 }
 
 void ArdLeaf::startCAN(int pin_cs, int pin_int) {
-  Serial.print("connecting to can...  ");
+  Serial.print("> Connecting to CAN...  ");
 
   canEV = new MCP_CAN(pin_cs);
   pinMode(pin_int, INPUT);
   
   if(canEV->begin(MCP_ANY, CAN_500KBPS, MCP_8MHZ) == CAN_OK) {
-    Serial.println("success :)");
+    Serial.println("Success!");
     canEV->setMode(MCP_NORMAL);
     pinINT = pin_int;
     canEnabled = true;
   } else {
-    Serial.println("error!");
+    Serial.println("Error!");
   }
 }
 
 void ArdLeaf::startSerial(long baud) {
   Serial.begin(baud);
+  Serial.println("\n###################");
+  Serial.println("ArdLeaf for Arduino\n");
+  Serial.println("Type 'l' to log all metrics.");
+  Serial.println("Type 's' send all metrics (for bluetooth)");
+  Serial.println("###################\n");
+  
+  Serial.println("# Setup");
+  Serial.print("> Serial running on baudrate ["); Serial.print(baud); Serial.println("]");
+
   serialEnabled = true;
+  MyMetrics.serialEnabled = true;
 }
 
 void ArdLeaf::startBluetooth(int tx, int rx) {
+  // TODO: Add baudrate option
   bt = new SoftwareSerial(tx, rx);
   bt->begin(9600);
-  bluetoothEnabled = true;
 
+  if (serialEnabled) {
+    Serial.println("> Bluetooth running on baudrate [9600]");
+  }
+
+  bluetoothEnabled = true;
   MyMetrics.output = bt;
 }
 
 void ArdLeaf::startGPS(int tx, int rx) {
+  // TODO: Add baudrate option
   gps = new TinyGPSPlus();
 
   gpsSerial = new SoftwareSerial(tx, rx);
   gpsSerial->begin(9600);
+
+  if (serialEnabled) {
+    Serial.println("> GPS running on baudrate [9600]");
+  }
   
   gpsEnabled = true;
 }
@@ -69,12 +89,14 @@ void ArdLeaf::startGPS(int tx, int rx) {
 void ArdLeaf::update() {
   ms = millis();
 
-  if (Serial.available() > 0) {
+  if (serialEnabled && Serial.available() > 0) {
     int input = Serial.read();
-    if (input == 97) { // (lowercase a) command to send all metrics
+    if (input == 115) { // (lowercase a) command to send all metrics
+      Serial.println("> Sending all metrics...");
       MyMetrics.SendAll();
-    } else if (input == 98) { // (lowercase b) test command
-      trip_distance->setValue(163);
+    } else if (input == 108) { // (lowercase l) command to log all metrics
+      Serial.println("> Logging all metrics...");
+      MyMetrics.LogAll();
     }
   }
 
@@ -94,9 +116,12 @@ void ArdLeaf::update() {
       double latitude = gps->location.lat();
       double longitude = gps->location.lng();
 
-      Serial.print(latitude, 6);
-      Serial.print(", "); 
-      Serial.println(longitude, 6);
+      if (serialEnabled) {
+        Serial.print("> LAT "); 
+        Serial.print(latitude, 6);
+        Serial.print(", LNG ");
+        Serial.print(longitude, 6);
+      }
 
       if (gpsLastLatitude != NULL && gpsLastLongitude != NULL && powered->value && gear->value != 1 && gear->value != 0) {
         float distance = TinyGPSPlus::distanceBetween(
@@ -104,16 +129,23 @@ void ArdLeaf::update() {
           gpsLastLatitude, gpsLastLongitude
         );
 
-        Serial.print("distance: "); Serial.println(distance);
+        if (serialEnabled) {
+          Serial.print(" [moved ");
+          Serial.print(distance);
+          Serial.print("m]");
+        }
 
         if (distance >= 0.3 && distance <= 1000) { 
-          // to try and correct for gps wandering (when not moving).
+          // to try and correct for gps wandering and glitching.
           // this isn't a very good way of doing it, it should probably be changed.
-
           tripDistance += distance;
           trip_distance->setValue((int) tripDistance/100); // reduce size of tripDistance variable for bluetooth
+        } else if (serialEnabled) {
+          Serial.print(" [OUT OF BOUNDS]");
         }
       }
+
+      if (serialEnabled) Serial.println();
 
       gpsLastLatitude = latitude;
       gpsLastLongitude = longitude;
@@ -161,7 +193,7 @@ void ArdLeaf::update() {
       float battery_current = -current / 2.0f;
       float battery_power = (battery_current * battery_voltage)/1000.0F;
       
-      if (powered->value && ms >= energy->lastUpdate+80) { // Only set if the car is on and it's been atleast 80ms since last update
+      if (powered->value && ms >= energy->lastUpdate+100) { // Only set if the car is on and it's been atleast 100ms since last update
         energy->setValue(battery_power);
       }
       
@@ -170,10 +202,10 @@ void ArdLeaf::update() {
       unsigned int leftSpeed = (msg[2] << 8) | msg[3];
       unsigned int rearSpeed = (msg[4] << 8) | msg[5];
 
-      speed->setValue(rearSpeed / 100);
+      if (ms >= speed->lastUpdate+80) speed->setValue(rearSpeed / 100);
 
-      if (ms >= left_speed->lastUpdate+100) left_speed->setValue(leftSpeed / 10);
-      if (ms >= right_speed->lastUpdate+100) right_speed->setValue(rightSpeed / 10);
+      if (ms >= left_speed->lastUpdate+500) left_speed->setValue(leftSpeed / 10);
+      if (ms >= right_speed->lastUpdate+500) right_speed->setValue(rightSpeed / 10);
 
       // divide by 208 for correct speed
 

@@ -11,9 +11,11 @@ void Metrics::RegisterMetric(Metric* metric) {
   metric->id = metricCount;
   metricCount++;
 
-  Serial.print(metric->name);
-  Serial.print(" -> registered with id ");
-  Serial.println(metric->id);
+  if (serialEnabled) {
+    Serial.print("> Registered metric ["); 
+    Serial.print(metric->name); 
+    Serial.println("]");
+  }
 
   if (first == NULL) {
     first = metric;
@@ -32,6 +34,11 @@ void Metrics::SendAll() {
     m->send(output);
   }
 }
+void Metrics::LogAll() {
+  for (Metric* m = first; m != NULL; m=m->next) {
+    m->log();
+  }
+}
 
 // metric
 Metric::Metric(const char* n, int bytes) {
@@ -40,6 +47,7 @@ Metric::Metric(const char* n, int bytes) {
   MyMetrics.RegisterMetric(this);
 }
 void Metric::send(SoftwareSerial* output) {}
+void Metric::log() {}
 
 // int
 MetricInt::MetricInt(const char* n, int bytes) : Metric(n, bytes) {}
@@ -52,13 +60,15 @@ void MetricInt::setValue(int val) {
   }
 }
 void MetricInt::send(SoftwareSerial* output) {
-  Serial.print(name);
-  Serial.print(" -> ");
-  Serial.println(value);
-
   if (output == NULL) return;
   output->write(id);
   output->write((byte *) &value, byteCount);
+}
+void MetricInt::log() {
+  Serial.print(name);
+  Serial.print(" [");
+  Serial.print(value);
+  Serial.println("]");
 }
 
 // float
@@ -72,14 +82,16 @@ void MetricFloat::setValue(float val) {
   }
 }
 void MetricFloat::send(SoftwareSerial* output) {
-  Serial.print(name);
-  Serial.print(" -> ");
-  Serial.println(value);
-
   if (output == NULL) return;
   int valueInt = value*100;
   output->write(id);
   output->write((byte *) &valueInt, byteCount);
+}
+void MetricFloat::log() {
+  Serial.print(name);
+  Serial.print(" [");
+  Serial.print(value);
+  Serial.println("]");
 }
 
 // bool
@@ -93,11 +105,13 @@ void MetricBool::setValue(bool val) {
   }
 }
 void MetricBool::send(SoftwareSerial* output) {
-  Serial.print(name);
-  Serial.print(" -> ");
-  Serial.println(value ? "true" : "false");
-
   if (output == NULL) return;
   output->write(id);
   output->write(value);
+}
+void MetricBool::log() {
+  Serial.print(name);
+  Serial.print(" [");
+  Serial.print(value ? "true" : "false");
+  Serial.println("]");
 }

@@ -10,6 +10,7 @@ class Metric {
 
   public:
     virtual void send(SoftwareSerial* output);
+    virtual void log();
 
   public:
     Metric* next;
@@ -26,6 +27,7 @@ class MetricInt: public Metric {
   public:
     void setValue(int val);
     void send(SoftwareSerial* output);
+    void log();
     int value = 0;
 };
 
@@ -36,6 +38,7 @@ class MetricFloat: public Metric {
   public:
     void setValue(float val);
     void send(SoftwareSerial* output);
+    void log();
     float value = 0.0f;
 };
 
@@ -46,6 +49,7 @@ class MetricBool: public Metric {
   public:
     void setValue(bool val);
     void send(SoftwareSerial* bt);
+    void log();
     bool value = false;
 };
 
@@ -56,11 +60,13 @@ class Metrics {
   public:
     void RegisterMetric(Metric* metric);
     void SendAll();
+    void LogAll();
     //Metric* Find(const char* name);
 
   public:
     Metric* first;
     SoftwareSerial* output;
+    bool serialEnabled = false;
 
   private:
     int metricCount = 0;
