@@ -102,9 +102,9 @@ void ArdLeaf::update() {
 
   if (bluetoothEnabled && bt->available() > 0) {
     int data = bt->read();
-    //if (data == 1) { // command 1 (send all metrics)
+    if (data == 1) { // command 1 (send all metrics)
       MyMetrics.SendAll();
-    //}
+    }
   }
 
   if (gpsEnabled) {
