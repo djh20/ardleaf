@@ -1,4 +1,4 @@
-**ATTENTION: This library is no longer in development. I would suggest looking at other libraries or creating your own. You may still use this library, but it doesn't contain any documentation and everything is a bit of a mess. I'm currently working on a Raspberry Pi CAN project at https://github.com/newhead/RaspberryCAN**
+**ATTENTION: This library is no longer in development. I would suggest looking at other libraries or creating your own. You may still use this library, but it doesn't contain any documentation and everything is a bit of a mess. I'm currently working on a Raspberry Pi CAN project at https://github.com/djh20/RaspberryCAN**
 
 # ArdLeaf
 An arduino library for reading information from a 2011 Nissan Leaf ZE0 ev-canbus, supports MCP2515 controllers.
